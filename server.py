@@ -29,7 +29,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
             self.protocol_object = match_protocol(self.initial_data)
             print(self.protocol_object.payload)
             self.post_data(data=self.protocol_object.payload)
-        except ProtocolNotRecognized as e:
+        except ProtocolNotRecognized:
             if len(self.initial_data) == 0:
                 logging.debug(f'Empty data sent in by a client. {self.client_address} | {datetime.now().strftime("%Y, %B %d %H:%M:%S")}')
             else:
@@ -38,7 +38,8 @@ class TCPHandler(socketserver.BaseRequestHandler):
             logging.critical(f'Uncaught exception: {e} | {datetime.now().strftime("%Y, %B %d %H:%M:%S")}')
 
     def post_data(self, data: dict) -> None:
-        requests.post(self.server.BACKEND_ADDRESS, data=data)
+        r = requests.post(self.server.BACKEND_ADDRESS, data=data)
+        print(r.text)
 
 
 if __name__ == "__main__":
