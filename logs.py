@@ -2,7 +2,7 @@
 import logging
 
 
-formatter = logging.Formatter('%(asctime)s | %(name)s | %(levelname)s | %(message)s')
+formatter = logging.Formatter('%(asctime)s %(name)s [%(levelname)s] - %(message)s')
 
 debug_handler = logging.FileHandler('logs/debug.log')
 error_handler = logging.FileHandler('logs/error.log')
