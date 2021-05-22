@@ -6,7 +6,7 @@ from protocols.h02 import H02
 protocols = {
     # NOTE: If you change any of the regexes, also check and patch respective protocol's class, also thoroughly inspect
     # backend and make sure nothing breaks.
-    '^\*([A-Z]+),(\d{10}),(V1),(\d{6}),(A|B|V),(-?\d{4}.\d{4}),(N|S),(-?\d{5}.\d{4}),(E|W),(\d{3}.\d{2}),(\d{3}),(\d{6}),([0-9A-F]+),(\d+),(\d+),(\d+),(\d+)#$': H02,
+    '^\*([A-Z]+),(\d{10}),(V\d),(\d{6}),(A|B|V),(-?\d{4}.\d{4}),(N|S),(-?\d{5}.\d{4}),(E|W),(\d{3}.\d{2}),(\d{3}),(\d{6}),([0-9A-F]+),(\d+),(\d+),(\d+),(\d+)#$': H02,
 }
 
 
