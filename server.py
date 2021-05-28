@@ -65,7 +65,10 @@ class ClientContext:
         except Exception as e:
             critical_logger.critical(f'Uncaught exception: {e}')
 
-        writer.write(b'ok')
+
+        response = f"*HQ,9171718264,R12,{protocol_object.payload['time']}#"
+        print(response)
+        writer.write(response.encode())
         await writer.drain()
 
         writer.close()
