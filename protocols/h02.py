@@ -38,6 +38,7 @@ class H02(BaseProtocol):
 
         self._maker = self.regex_match.group(1)
         self._device_serial_number = self.regex_match.group(2)
+        self._time = self.regex_match.group(4)
         self._validity = self.regex_match.group(5)
         self._direction = self.regex_match.group(11)
         self._mobile_country_code = self.regex_match.group(14)
@@ -54,6 +55,8 @@ class H02(BaseProtocol):
         :rtype: int
         """
         acc = self.get_bit_state(self.vehicle_status_third_byte, 6)
+
+        # TODO: _acc_off? is _acc_off true?
 
         return acc
 

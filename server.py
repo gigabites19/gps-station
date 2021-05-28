@@ -18,6 +18,7 @@ class ClientContext:
     """
 
     def __init__(self):
+        self.counter = 0
         self.session = aiohttp.ClientSession()
         self.server_address = os.getenv('BACKEND_URL')
     
@@ -51,6 +52,8 @@ class ClientContext:
 
         initial_data = initial_data.decode()
 
+        print(f'Received: {initial_data}')
+
         try:
             protocol_object = match_protocol(initial_data)
             response = await self.send_to_server(protocol_object.payload)
@@ -61,6 +64,12 @@ class ClientContext:
                 error_logger.error(f'Unrecognized protocol: {initial_data}')
         except Exception as e:
             critical_logger.critical(f'Uncaught exception: {e}')
+
+        writer.write(b'ok')
+        await writer.drain()
+
+        writer.close()
+        await writer.wait_closed()
 
 
 async def main():
