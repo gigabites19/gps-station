@@ -21,11 +21,10 @@ class Station:
         response = await self.session.post(self.server_address, data=payload)
 
         if response.status == 201:
-            # Here server should any commands that might be there in queue for the
+            # Here server should send back any commands that might be there in queue for the device
             pass
         else:
             error_logger.error(f'Server returned unexpected response: {response.text}')
-
 
     async def handle_request(self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> None:
 
@@ -49,7 +48,7 @@ class Station:
             except Exception as e:
                 critical_logger.critical(f'Uncaught exception: {e}')
 
-            
+
 
 async def main():
     session = aiohttp.ClientSession()
