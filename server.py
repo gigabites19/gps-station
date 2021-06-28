@@ -17,12 +17,22 @@ class Station:
         self.session = session
         self.server_address = server_address
 
+
+        self.counter = 0
+
+    
+    async def mark_command_complete(self, command_id: str) -> None:
+        response = await self.session.post(f'{self.server_address}/tracker/mark-command-complete/', data={'id': command_id})
+        print(f'marking command {command_id} complete')
+        print(response.status)
+
     async def send_to_server(self, payload: dict) -> None:
-        response = await self.session.post(self.server_address, data=payload)
+        response = await self.session.post(f'{self.server_address}/tracker/add-location/', data=payload)
 
         if response.status == 201:
-            # Here server should send back any commands that might be there in queue for the device
-            pass
+            response = await response.json()
+            
+            return response 
         else:
             error_logger.error(f'Server returned unexpected response: {response.text}')
 
@@ -36,7 +46,10 @@ class Station:
 
             try:
                 protocol_object = match_protocol(initial_data)
-                await self.send_to_server(protocol_object.payload)
+                command = await self.send_to_server(protocol_object.payload)
+                if command and not command['fulfilled']:
+                     # await writer.write(command['command_code'].encode())
+                    await self.mark_command_complete(command['id'])
             except ProtocolNotRecognized:
                 if initial_data:
                     error_logger.error(f'Unrecognized protocol {initial_data}')
