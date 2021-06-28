@@ -48,7 +48,7 @@ class Station:
                 protocol_object = match_protocol(initial_data)
                 command = await self.send_to_server(protocol_object.payload)
                 if command and not command['fulfilled']:
-                     # await writer.write(command['command_code'].encode())
+                    await writer.write(command['command_code'].encode())
                     await self.mark_command_complete(command['id'])
             except ProtocolNotRecognized:
                 if initial_data:
