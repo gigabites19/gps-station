@@ -1,5 +1,4 @@
 import re
-from typing import Union
 from .base import BaseProtocol
 from helpers.chunks import get_chunks
 
@@ -22,7 +21,7 @@ class H02(BaseProtocol):
         :param _device_serial_number: factory set device ID
         :param _validity: Sent in data's validity, it's either valid or it's not.
         :param _latitudinal_hemisphere: Self explanatory, N|S
-        :param _longitudinal_hemisphere: Slef explanatory, W|E
+        :param _longitudinal_hemisphere: Self explanatory, W|E
         :param _direction: Direction, azimuth at 000 is pointing to north.
         :param _mobile_country_code: Mobile country code, 282 is for Georgia
         :param _mobile_network_code: Operator ID, i.e. Geocell, Beeline, Magti etc... 02 is Geocell.
@@ -39,7 +38,6 @@ class H02(BaseProtocol):
         self._maker = self.regex_match.group(1)
         self._device_serial_number = self.regex_match.group(2)
         self._time = self.regex_match.group(4)
-        self._validity = self.regex_match.group(5)
         self._direction = self.regex_match.group(11)
         self._mobile_country_code = self.regex_match.group(14)
         self._mobile_network_code = self.regex_match.group(15)
@@ -47,7 +45,14 @@ class H02(BaseProtocol):
         self._cell_id = self.regex_match.group(17)
 
     @property
-    def _acc(self) -> int:
+    def _valid(self) -> bool:
+        if self.regex_match.group(5) == 'A':
+            return True
+
+        return False
+
+    @property
+    def _acc(self) -> bool:
         """
         Checks the bit telling us about the ACC status, either it's on or off.
 
@@ -117,12 +122,12 @@ class H02(BaseProtocol):
 
         return float(formatted_result)
 
-    def get_bit_state(self, hex_byte: str, attribute_bit_location: int) -> int:
+    def get_bit_state(self, hex_byte: str, attribute_bit_location: int) -> bool:
         """
         Used for getting values from hex bitmask sent in by the protocol.
 
         Protocol sends in total of "4" bytes (it's not really hex, just ASCII representation),
-        Each byte coresponds to 8 values (not all of them, some are just there...
+        Each byte corresponds to 8 values (not all of them, some are just there...
         see documentation for more). i.e. server could send in 'FFFF9FFF', first byte is FF, second byte is FF,
         third byte is 9F, and last fourth byte is FF. The attributes of our interest can be in any of those.
         If we convert FF to decimal we get 255, or 11111111 in binary.
@@ -140,6 +145,6 @@ class H02(BaseProtocol):
         mask = 0b1 << attribute_bit_location - 1
         # Protocol adopts negative logic, 0 = valid
         if not byte_val & mask:
-            return 1
+            return True
         else:
-            return 0
+            return False

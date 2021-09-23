@@ -16,16 +16,9 @@ class Station:
     def __init__(self, session: aiohttp.ClientSession, server_address: str) -> None:
         self.session = session
         self.server_address = server_address
-
-
         self.counter = 0
 
     
-    async def mark_command_complete(self, command_id: str) -> None:
-        response = await self.session.post(f'{self.server_address}/tracker/mark-command-complete/', data={'id': command_id})
-        print(f'marking command {command_id} complete')
-        print(response.status)
-
     async def send_to_server(self, payload: dict) -> None:
         response = await self.session.post(f'{self.server_address}/tracker/add-location/', data=payload)
 
@@ -46,10 +39,7 @@ class Station:
 
             try:
                 protocol_object = match_protocol(initial_data)
-                command = await self.send_to_server(protocol_object.payload)
-                if command and not command['fulfilled']:
-                    await writer.write(command['command_code'].encode())
-                    await self.mark_command_complete(command['id'])
+                await self.send_to_server(protocol_object.payload)
             except ProtocolNotRecognized:
                 if initial_data:
                     error_logger.error(f'Unrecognized protocol {initial_data}')
@@ -71,8 +61,8 @@ async def main():
 
     server = await asyncio.start_server(station.handle_request, '', 8090)
 
-    addr = server.sockets[0].getsockname()
-    print(f'Serving on {addr}')
+    address = server.sockets[0].getsockname()
+    print(f'Serving on {address}')
 
     async with server:
         await server.serve_forever()
