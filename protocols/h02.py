@@ -20,8 +20,6 @@ class H02(BaseProtocol):
         :param _maker: Manufacturer of the device
         :param _device_serial_number: factory set device ID
         :param _validity: Sent in data's validity, it's either valid or it's not.
-        :param _latitudinal_hemisphere: Self explanatory, N|S
-        :param _longitudinal_hemisphere: Self explanatory, W|E
         :param _direction: Direction, azimuth at 000 is pointing to north.
         :param _mobile_country_code: Mobile country code, 282 is for Georgia
         :param _mobile_network_code: Operator ID, i.e. Geocell, Beeline, Magti etc... 02 is Geocell.
@@ -52,7 +50,7 @@ class H02(BaseProtocol):
         return False
 
     @property
-    def _acc(self) -> bool:
+    def _accessories(self) -> bool:
         """
         Checks the bit telling us about the ACC status, either it's on or off.
 
