@@ -9,7 +9,7 @@ class BaseProtocol:
     All subclasses should define attributes that will be sent to the server with
     one preceding underscore (_). If attribute requires any further processing after
     getting it from regex group, then it should be defined as a @property, the property
-    name should also start with an underscode.
+    name should also start with an underscore.
 
     :param required_sublass_attributes: Attributes that subclasses must define
     :type required_sublass_attributes: list
@@ -17,16 +17,19 @@ class BaseProtocol:
 
     required_subclass_attributes: list = ['_protocol']
 
-    def __init__(self, regex_match: Match) -> None:
+    def __init__(self, regex_match: Match, _raw_data: str) -> None:
         """
         Initializes the base parameters and checks that the subclass' instance and thus
         the subclass itself has defined required attributes.
 
         :param regex_match: re.Match object provided by the matcher, contains groups
         :type regex_match: Match
+        :param _raw_data: raw protocol data send by the device
+        :type _raw_data: string
         :rtype: None
         """
         self.regex_match = regex_match
+        self._raw_data = _raw_data
 
         self.check_subclass_attributes()
 

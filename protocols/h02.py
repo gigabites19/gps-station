@@ -13,7 +13,7 @@ class H02(BaseProtocol):
 
     _protocol: str = "H02"
 
-    def __init__(self, regex_match: re.Match) -> None:
+    def __init__(self, regex_match: re.Match, _raw_data: str) -> None:
         """
         Initializes all the parameters that don't need any transformation and can be grabbed straight out of regex.
 
@@ -28,7 +28,7 @@ class H02(BaseProtocol):
         :param _local_area_code: Code of the area the device is in at the moment
         :param _cell_id: Base Transceiver Station ID
         """
-        super().__init__(regex_match)
+        super().__init__(regex_match, _raw_data)
         self.vehicle_status_bytes = [i for i in get_chunks(self.regex_match.group(13), 2)]
         self.vehicle_status_first_byte = self.vehicle_status_bytes[0]
         self.vehicle_status_second_byte = self.vehicle_status_bytes[1]
@@ -60,8 +60,6 @@ class H02(BaseProtocol):
         :rtype: int
         """
         acc = self.get_bit_state(self.vehicle_status_third_byte, 6)
-
-        # TODO: _acc_off? is _acc_off true?
 
         return acc
 

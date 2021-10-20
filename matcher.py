@@ -23,5 +23,5 @@ def match_protocol(string: str) -> BaseProtocol:
         pattern = re.compile(regexp)
         match = re.match(pattern, string)
         if match:
-            return protocol(match)
+            return protocol(match, string)
     raise ProtocolNotRecognized
