@@ -76,7 +76,10 @@ class H02(BaseProtocol):
         kmh = float(raw_speed) * 1.852
         kmh_formatted = format(kmh, '05.2f')
 
-        return float(kmh_formatted)
+        if self._acc:
+            return float(kmh_formatted)
+
+        return 0.00
 
     @property
     def _latitude(self) -> float:
