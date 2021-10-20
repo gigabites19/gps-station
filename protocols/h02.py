@@ -74,7 +74,7 @@ class H02(BaseProtocol):
         kmh = float(raw_speed) * 1.852
         kmh_formatted = format(kmh, '05.2f')
 
-        if self._acc:
+        if self._accessories:
             return float(kmh_formatted)
 
         return 0.00
