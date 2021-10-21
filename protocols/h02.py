@@ -121,6 +121,12 @@ class H02(BaseProtocol):
 
         return float(formatted_result)
 
+    @property
+    def _cut_fuel(self) -> bool:
+        cut_fuel = self.get_bit_state(self.vehicle_status_third_byte, 5)
+
+        return cut_fuel
+
     def get_bit_state(self, hex_byte: str, attribute_bit_location: int) -> bool:
         """
         Used for getting values from hex bitmask sent in by the protocol.
