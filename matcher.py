@@ -24,4 +24,4 @@ def match_protocol(string: str) -> BaseProtocol:
         match = re.match(pattern, string)
         if match:
             return protocol(match, string)
-    raise ProtocolNotRecognized
+    raise ProtocolNotRecognized(string)
