@@ -124,8 +124,6 @@ class H02(BaseProtocol):
     @property
     def _cut_fuel(self) -> bool:
         cut_fuel = self.get_bit_state(self.vehicle_status_first_byte, 4)
-        print(self.vehicle_status_first_byte)
-        print(cut_fuel)
 
         return cut_fuel
 
