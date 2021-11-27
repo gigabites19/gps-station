@@ -23,7 +23,7 @@ class Station:
         response = await self.session.post(f'{self.server_address}/tracker/add-location/', data=payload)
 
         if response.status == 201:
-            response = await response.json()
+            response = await response.json(content_type=None)
             
             return response 
         else:
