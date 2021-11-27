@@ -22,4 +22,4 @@ jobs:
             cd station/
             git pull origin main
             sudo systemctl restart station
-  
+            
