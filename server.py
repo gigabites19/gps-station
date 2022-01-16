@@ -2,8 +2,10 @@ import os
 import asyncio
 import aiohttp
 
+from protocols.h02.h02_location import H02Location
+
 from dotenv import load_dotenv
-from matcher import match_protocol
+from matcher.matcher import match_protocol
 
 from exceptions import ProtocolNotRecognized
 from logs import debug_logger, error_logger, critical_logger
@@ -16,28 +18,27 @@ class Station:
     def __init__(self, session: aiohttp.ClientSession, server_address: str) -> None:
         self.session = session
         self.server_address = server_address
-        self.counter = 0
-
-    
-    async def send_to_server(self, payload: dict) -> None:
-        response = await self.session.post(f'{self.server_address}/tracker/add-location/', data=payload)
-
-        if response.status == 201:
-            response = await response.json(content_type=None)
-            
-            return response 
-        else:
-            error_logger.error(f'Server returned unexpected response: {response.text}')
+        self.stream_writers = {}
 
     async def handle_request(self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> None:
 
         while True:
             initial_data = await reader.read(1024)
             initial_data = initial_data.decode()
-
+            print(initial_data)
+            
             try:
                 protocol_object = match_protocol(initial_data)
-                await self.send_to_server(protocol_object.payload)
+
+                # Only save the writer if it's a location connection because that is the TCP stream we want to write commands to.
+                if isinstance(protocol_object, H02Location):
+                    self.stream_writers[protocol_object.payload['device_serial_number']] = writer
+
+                device_writer = self.stream_writers.get(protocol_object.payload['device_serial_number'])
+
+                if device_writer:
+                    await protocol_object.action(reader, device_writer, self.session)
+
             except ProtocolNotRecognized:
                 if initial_data:
                     error_logger.error(f'Unrecognized protocol {initial_data}')
@@ -48,7 +49,6 @@ class Station:
                     break
             except Exception as e:
                 critical_logger.critical(f'Uncaught exception: {e}')
-
 
 
 async def main():
