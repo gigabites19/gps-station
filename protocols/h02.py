@@ -50,14 +50,14 @@ class H02(BaseProtocol):
         return False
 
     @property
-    def _accessories(self) -> bool:
+    def _accessories_off(self) -> bool:
         """
         Checks the bit telling us about the ACC status, either it's on or off.
 
         :returns: State of the ACC
         :rtype: int
         """
-        acc = self.get_bit_state(self.vehicle_status_third_byte, 6)
+        acc = self.get_bit_state(self.vehicle_status_third_byte, 3)
 
         return acc
 
@@ -148,8 +148,6 @@ class H02(BaseProtocol):
         byte_val = int(hex_byte, 16)
 
         mask = 0b1 << attribute_bit_location - 1
+
         # Protocol adopts negative logic, 0 = valid
-        if not byte_val & mask:
-            return True
-        else:
-            return False
+        return not byte_val & mask
