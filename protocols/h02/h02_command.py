@@ -25,4 +25,4 @@ class H02Command(H02):
     
     async def action(self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter, session: aiohttp.ClientSession):
         print(self.formatted_command)
-        await writer.write(f'{self.formatted_command}'.encode())
+        writer.write(f'{self.formatted_command}'.encode())
