@@ -68,14 +68,14 @@ class H02Location(H02):
         return False
 
     @property
-    def _accessories(self) -> bool:
+    def _accessories_off(self) -> bool:
         """
         Checks the bit telling us about the ACC status, either it's on or off.
 
         :returns: State of the ACC
         :rtype: int
         """
-        acc = self.get_bit_state(self.vehicle_status_third_byte, 6)
+        acc = self.get_bit_state(self.vehicle_status_third_byte, 3)
 
         return acc
 
