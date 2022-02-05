@@ -17,22 +17,16 @@ class BaseProtocol:
 
     required_subclass_attributes: list = ['_protocol']
 
-    def __init__(self, regex_match: Match, _raw_data: str) -> None:
+    def __init__(self) -> None:
         """
         Initializes the base parameters and checks that the subclass' instance and thus
         the subclass itself has defined required attributes.
 
-        :param regex_match: re.Match object provided by the matcher, contains groups
-        :type regex_match: Match
-        :param _raw_data: raw protocol data send by the device
-        :type _raw_data: string
         :rtype: None
         """
-        self.regex_match = regex_match
-        self._raw_data = _raw_data
-
         self.check_subclass_attributes()
 
+    # TODO: test that this is always enforced
     def check_subclass_attributes(self) -> None:
         """
         Checks that the instance's class has defined all the required attributes
@@ -52,7 +46,7 @@ class BaseProtocol:
         Returns a dictionary containing all the attributes the server needs to save GPS data.
 
         Loops over all the attributes/methods/class attributes and grabs those that starts with _ and guards against
-        those that start with __ to avoid getting python's built-in stuff. We remove the leading  underscore because
+        those that start with __ to avoid getting python's built-in stuff. We remove the leading underscore because
         attribute names that we send from here must exactly match those defined in backend models.
 
         :returns: Cleaned, formatted data ready to be saved by the backend server.

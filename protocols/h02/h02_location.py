@@ -1,17 +1,18 @@
+import os
 import re
-from .base import BaseProtocol
+import asyncio
+import aiohttp
+from dotenv import load_dotenv
 from helpers.chunks import get_chunks
+from protocols.h02.h02 import H02
+from logs import error_logger
+
+load_dotenv()
 
 
-class H02(BaseProtocol):
-    """
-    Class for H02 protocol.
+class H02Location(H02):
 
-    :param _protocol: Protocol's name, will be sent to the backend server.
-    :type _protocol: str
-    """
-
-    _protocol: str = "H02"
+    API_ENDPOINT = os.getenv('BACKEND_URL')
 
     def __init__(self, regex_match: re.Match, _raw_data: str) -> None:
         """
@@ -26,8 +27,13 @@ class H02(BaseProtocol):
         :param _local_area_code: Code of the area the device is in at the moment
         :param _cell_id: Base Transceiver Station ID
         """
-        super().__init__(regex_match, _raw_data)
-        self.vehicle_status_bytes = [i for i in get_chunks(self.regex_match.group(13), 2)]
+        super().__init__()
+
+        self.regex_match = regex_match
+        self._raw_data = _raw_data
+
+        # FIXME: this is clunky
+        self.vehicle_status_bytes = [i for i in get_chunks(regex_match.group(13), 2)]
         self.vehicle_status_first_byte = self.vehicle_status_bytes[0]
         self.vehicle_status_second_byte = self.vehicle_status_bytes[1]
         self.vehicle_status_third_byte = self.vehicle_status_bytes[2]
@@ -41,6 +47,18 @@ class H02(BaseProtocol):
         self._mobile_network_code = self.regex_match.group(15)
         self._local_area_code = self.regex_match.group(16)
         self._cell_id = self.regex_match.group(17)
+
+    #FIXME: writer parameter is not needed here and I don't see it ever being needed.
+    #FIXME: It's cleaner if subclasses (H02Location, H02Command, H02CommandConfirmation) deal only with data processing and parent class (H02) deals with performing needed actions for them.
+    async def action(self, reader: aiohttp.StreamReader, writer: asyncio.StreamWriter, session: aiohttp.ClientSession):
+        response = await session.post(f'{self.API_ENDPOINT}/tracker/add-location/', data=self.payload)
+
+        if response.status == 201:
+            response = await response.json(content_type=None)
+
+            return response
+        else:
+            error_logger.error(f'Server returned an unexpected response: {response.text}')
 
     @property
     def _valid(self) -> bool:
@@ -74,7 +92,7 @@ class H02(BaseProtocol):
         kmh = float(raw_speed) * 1.852
         kmh_formatted = format(kmh, '05.2f')
 
-        if self._accessories:
+        if not self._accessories_off:
             return float(kmh_formatted)
 
         return 0.00
