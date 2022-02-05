@@ -166,8 +166,6 @@ class H02Location(H02):
         byte_val = int(hex_byte, 16)
 
         mask = 0b1 << attribute_bit_location - 1
+
         # Protocol adopts negative logic, 0 = valid
-        if not byte_val & mask:
-            return True
-        else:
-            return False
+        return not byte_val & mask
