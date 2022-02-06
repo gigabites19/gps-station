@@ -13,6 +13,8 @@ load_dotenv()
 class H02Location(H02):
 
     API_ENDPOINT = os.getenv('BACKEND_URL')
+    LOCATION_REGEX = r'^\*([A-Z]+),(\d{10}),(V\d),(\d{6}),(A|B|V),(-?\d{4}.\d{4}),(N|S),(-?\d{5}.\d{4}),(E|W),(\d{3}.\d{2}),(\d{3}),(\d{6}),([0-9A-F]+),(\d+),(\d+),(\d+),(\d+)#$'
+    COMMAND_CONFIRMATION_REGEX = r'^\*([A-Z]+),(\d{10}),(V\d),(S\d+),(OK|DONE),(\d{6}),(\d{6}),(A|B|V),(-?\d{4}.\d{4}),(N|S),(-?\d{5}.\d{4}),(E|W),(\d{1,3}.\d{2}),(\d{1,3}),(\d{6}),([0-9A-Fa-f]+),(\d+),(\d+),(\d+),(\d+)#$'
 
     def __init__(self, regex_match: re.Match, _raw_data: str) -> None:
         """
@@ -28,6 +30,13 @@ class H02Location(H02):
         :param _cell_id: Base Transceiver Station ID
         """
         super().__init__()
+
+        # This is a location data sent as a command confirmation.
+        if regex_match.group(3) == 'V4':
+            # Transform command confirmation data packet to look like a normal location data and
+            # also set 'is_command_confirmation' to true
+            regex_match = re.match(self.LOCATION_REGEX, re.sub(r'V4,S20,OK,\d{6}', 'V1', _raw_data))
+            self._is_command_confirmation = True
 
         self.regex_match = regex_match
         self._raw_data = _raw_data
@@ -52,6 +61,7 @@ class H02Location(H02):
     #FIXME: It's cleaner if subclasses (H02Location, H02Command, H02CommandConfirmation) deal only with data processing and parent class (H02) deals with performing needed actions for them.
     async def action(self, reader: aiohttp.StreamReader, writer: asyncio.StreamWriter, session: aiohttp.ClientSession):
         response = await session.post(f'{self.API_ENDPOINT}/tracker/add-location/', data=self.payload)
+        print(self.payload)
 
         if response.status == 201:
             response = await response.json(content_type=None)

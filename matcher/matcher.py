@@ -4,13 +4,13 @@ from protocols.base import BaseProtocol
 # TODO: import all of those at once from package
 from protocols.h02.h02_location import H02Location # FIXME: weird import
 from protocols.h02.h02_command import H02Command
-from protocols.h02.h02_command_confirmation import H02CommandConfirmation
 
 
 protocols = {
     # NOTE: If you change any of the regexes, also check and patch respective protocol's class, also thoroughly inspect backend and make sure nothing breaks.
-    r'^\*([A-Z]+),(\d{10}),(V\d),(\d{6}),(A|B|V),(-?\d{4}.\d{4}),(N|S),(-?\d{5}.\d{4}),(E|W),(\d{3}.\d{2}),(\d{3}),(\d{6}),([0-9A-F]+),(\d+),(\d+),(\d+),(\d+)#$': H02Location,
-    r'^H02,(\d{10}),(CUT_FUEL|ENABLE_FUEL)$': H02Command
+    H02Location.LOCATION_REGEX: H02Location,
+    r'^H02,(\d{10}),(CUT_FUEL|ENABLE_FUEL)$': H02Command,
+    H02Location.COMMAND_CONFIRMATION_REGEX: H02Location
 }
 
 
