@@ -61,7 +61,6 @@ class H02Location(H02):
     #FIXME: It's cleaner if subclasses (H02Location, H02Command, H02CommandConfirmation) deal only with data processing and parent class (H02) deals with performing needed actions for them.
     async def action(self, reader: aiohttp.StreamReader, writer: asyncio.StreamWriter, session: aiohttp.ClientSession):
         response = await session.post(f'{self.API_ENDPOINT}/tracker/add-location/', data=self.payload)
-        print(self.payload)
 
         if response.status == 201:
             response = await response.json(content_type=None)
