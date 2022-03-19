@@ -25,7 +25,6 @@ class Station:
         while True:
             initial_data = await reader.read(1024)
             initial_data = initial_data.decode()
-            print(initial_data)
             
             try:
                 protocol_object = match_protocol(initial_data)
