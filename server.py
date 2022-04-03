@@ -2,7 +2,8 @@ import os
 import asyncio
 import aiohttp
 
-from protocols.h02.h02_location import H02Location
+from protocols.base_location import BaseLocation
+from protocols.base_command import BaseCommand
 
 from dotenv import load_dotenv
 from matcher.matcher import match_protocol
@@ -25,18 +26,27 @@ class Station:
         while True:
             initial_data = await reader.read(1024)
             initial_data = initial_data.decode()
+            print(initial_data)
             
             try:
                 protocol_object = match_protocol(initial_data)
 
-                # Only save the writer if it's a location connection because that is the TCP stream we want to write commands to.
-                if isinstance(protocol_object, H02Location):
+                if isinstance(protocol_object, BaseLocation):
+                    # Only save the writer if it's a location connection because that is the TCP stream we want to write commands to.
                     self.stream_writers[protocol_object.payload['device_serial_number']] = writer
+                    
+                    if protocol_object.gprs_blocked:
+                        # clear out the alarms and make the device catch up if GPRS is blocked
+                        command = f'*HQ,{protocol_object.payload.get("device_serial_number")},R7,130305#'
+                        await writer.write(command.encode())
+                    else:
+                        await protocol_object.send_data_uplink(reader, self.session)
+                        await write.write(b'*HQ,9172238460,R12,130305#') # responding to the device, not sure yet if necessary
+                elif isinstance(protocol_object, BaseCommand):
+                    device_writer = self.stream_writers.get(protocol_object.payload.get('device_serial_number'))
 
-                device_writer = self.stream_writers.get(protocol_object.payload['device_serial_number'])
-
-                if device_writer:
-                    await protocol_object.action(reader, device_writer, self.session)
+                    if device_writer:
+                            await protocol_object.send_data_downlink(device_writer, self.session)
 
             except ProtocolNotRecognized:
                 if initial_data:

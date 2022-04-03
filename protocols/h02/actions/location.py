@@ -1,20 +1,11 @@
-import os
 import re
-import asyncio
-import aiohttp
-from dotenv import load_dotenv
+from protocols.base_location import BaseLocation
 from helpers.chunks import get_chunks
-from protocols.h02.h02 import H02
-from logs import error_logger
-
-load_dotenv()
 
 
-class H02Location(H02):
-
-    API_ENDPOINT = os.getenv('BACKEND_URL')
+class Location(BaseLocation):
+    # TODO: this is already defined elsewhere
     LOCATION_REGEX = r'^\*([A-Z]+),(\d{10}),(V\d),(\d{6}),(A|B|V),(-?\d{4}.\d{4}),(N|S),(-?\d{5}.\d{4}),(E|W),(\d{1,3}.\d{2}),(\d{1,3}),(\d{6}),([0-9A-Fa-f]+),(\d+),(\d+),(\d+),(\d+)#$'
-    COMMAND_CONFIRMATION_REGEX = r'^\*([A-Z]+),(\d{10}),(V\d),(S\d+),(OK|DONE),(\d{6}),(\d{6}),(A|B|V),(-?\d{4}.\d{4}),(N|S),(-?\d{5}.\d{4}),(E|W),(\d{1,3}.\d{2}),(\d{1,3}),(\d{6}),([0-9A-Fa-f]+),(\d+),(\d+),(\d+),(\d+)#$'
 
     def __init__(self, regex_match: re.Match, _raw_data: str) -> None:
         """
@@ -29,7 +20,6 @@ class H02Location(H02):
         :param _local_area_code: Code of the area the device is in at the moment
         :param _cell_id: Base Transceiver Station ID
         """
-        super().__init__()
 
         # This is a location data sent as a command confirmation.
         if regex_match.group(3) == 'V4':
@@ -56,18 +46,6 @@ class H02Location(H02):
         self._mobile_network_code = self.regex_match.group(15)
         self._local_area_code = self.regex_match.group(16)
         self._cell_id = self.regex_match.group(17)
-
-    #FIXME: writer parameter is not needed here and I don't see it ever being needed.
-    #FIXME: It's cleaner if subclasses (H02Location, H02Command, H02CommandConfirmation) deal only with data processing and parent class (H02) deals with performing needed actions for them.
-    async def action(self, reader: aiohttp.StreamReader, writer: asyncio.StreamWriter, session: aiohttp.ClientSession):
-        response = await session.post(f'{self.API_ENDPOINT}/tracker/add-location/', data=self.payload)
-
-        if response.status == 201:
-            response = await response.json(content_type=None)
-
-            return response
-        else:
-            error_logger.error(f'Server returned an unexpected response: {response.text}')
 
     @property
     def _valid(self) -> bool:
@@ -178,3 +156,9 @@ class H02Location(H02):
 
         # Protocol adopts negative logic, 0 = valid
         return not byte_val & mask
+
+    @property
+    def gprs_blocked(self) -> bool:
+        gprs_blocked = self.get_bit_state(self.vehicle_status_first_byte, 3)
+
+        return gprs_blocked

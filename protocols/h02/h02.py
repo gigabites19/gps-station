@@ -1,6 +1,9 @@
 import re
 from dotenv import load_dotenv
 from protocols.base import BaseProtocol
+from .actions.location import Location
+from .actions.command import Command
+from .actions.custom_command import CustomCommand
 
 
 class H02(BaseProtocol):
@@ -9,21 +12,17 @@ class H02(BaseProtocol):
 
     :param _protocol: Protocol's name, will be sent to the backend server.
     :type _protocol: str
+    :param regular_expressions: regular expressions of the protocol that match classes that perform actions linked with this protocol
+    :type regular_expressions: dict
     """
 
     # TODO: force all subclasses to have some attributes defined
-
     _protocol: str = "H02"
 
-    """
-    after device sends data to the server we must find out which protocol it belongs to. then we must find out what kind of command it is.
-    for now it can be one of three: location data, command data (this will be sent from the backend itself) or command confirmation data (which is sent by the device itself)
-
-    here are what we must do for each data point:
-
-    location data: we send the location data to the backend to be saved
-
-    command: we identify who the command is for and then send that command to the mobile station
-
-    command confirmation data: we get the status and send it to the backend to mark the command as complete
-    """
+    # TODO: test that all protocols define those with protocol name appended in front for dictionary key
+    regular_expressions: dict = {
+        r'^\*([A-Z]+),(\d{10}),(V\d),(\d{6}),(A|B|V),(-?\d{4}.\d{4}),(N|S),(-?\d{5}.\d{4}),(E|W),(\d{1,3}.\d{2}),(\d{1,3}),(\d{6}),([0-9A-Fa-f]+),(\d+),(\d+),(\d+),(\d+)#$': Location,
+        r'^\*([A-Z]+),(\d{10}),(V\d),(S\d+),(OK|DONE),(\d{6}),(\d{6}),(A|B|V),(-?\d{4}.\d{4}),(N|S),(-?\d{5}.\d{4}),(E|W),(\d{1,3}.\d{2}),(\d{1,3}),(\d{6}),([0-9A-Fa-f]+),(\d+),(\d+),(\d+),(\d+)#$': Location,
+        r'^H02,(\d{10}),(CUT_FUEL|ENABLE_FUEL)$': Command,
+        r'custom\((\d{10})\)\((.*)\)': CustomCommand # For testing
+    }

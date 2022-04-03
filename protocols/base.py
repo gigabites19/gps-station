@@ -15,7 +15,7 @@ class BaseProtocol:
     :type required_sublass_attributes: list
     """
 
-    required_subclass_attributes: list = ['_protocol']
+    required_subclass_attributes: list = ['_protocol', 'regular_expressions']
 
     def __init__(self) -> None:
         """
@@ -39,22 +39,3 @@ class BaseProtocol:
                 getattr(self, attribute)
             except AttributeError:
                 raise AttributeNotSet(attribute)
-
-    @property
-    def payload(self) -> dict:
-        """
-        Returns a dictionary containing all the attributes the server needs to save GPS data.
-
-        Loops over all the attributes/methods/class attributes and grabs those that starts with _ and guards against
-        those that start with __ to avoid getting python's built-in stuff. We remove the leading underscore because
-        attribute names that we send from here must exactly match those defined in backend models.
-
-        :returns: Cleaned, formatted data ready to be saved by the backend server.
-        :rtype: dict
-        """
-        payload = {
-            attr[1:]:getattr(self, attr) for attr in dir(self)
-            if attr.startswith('_') and not attr.startswith('__')
-        }
-
-        return payload
