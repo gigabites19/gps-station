@@ -38,6 +38,7 @@ class Station:
                     if protocol_object.gprs_blocked:
                         # clear out the alarms and make the device catch up if GPRS is blocked
                         command = f'*HQ,{protocol_object.payload.get("device_serial_number")},R7,130305#'
+                        print('received location with GPRS_BLOCKED, clearing out all the alarms')
                         await writer.write(command.encode())
                     else:
                         await protocol_object.send_data_uplink(reader, self.session)
