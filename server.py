@@ -24,7 +24,7 @@ class Station:
     async def handle_request(self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> None:
 
         while True:
-            initial_data = await reader.read(1024)
+            initial_data = await reader.read()
             initial_data = initial_data.decode()
 
             try:
@@ -59,8 +59,8 @@ class Station:
                     writer.close()
                     await writer.wait_closed()
                     break
-            # except Exception as e:
-            #     critical_logger.critical(f'Uncaught exception: {e}')
+            except Exception as e:
+                critical_logger.critical(f'Uncaught exception: {e}')
 
 
 async def main():
