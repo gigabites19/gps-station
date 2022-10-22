@@ -45,7 +45,7 @@ class Station:
                     device_writer = self.stream_writers.get(protocol_object.payload.get('device_serial_number'))
 
                     if device_writer:
-                            await protocol_object.send_data_downlink(device_writer, self.session)
+                        await protocol_object.send_data_downlink(device_writer, self.session)
 
             except ProtocolNotRecognized:
                 if initial_data:
