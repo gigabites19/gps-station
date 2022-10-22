@@ -37,7 +37,7 @@ class Station:
                     
                     if protocol_object.gprs_blocked:
                         # clear out the alarms and make the device catch up if GPRS is blocked
-                        command = f'*HQ,{protocol_object.payload.get("device_serial_number")},R7,130305#'.encode()
+                        command = f"*HQ,{protocol_object.payload.get('device_serial_number')},R7,130305#".encode()
                         writer.write(command)
                         await writer.drain()
                     else:
@@ -50,7 +50,6 @@ class Station:
 
                     if device_writer:
                         await protocol_object.send_data_downlink(device_writer, self.session)
-
             except ProtocolNotRecognized:
                 if initial_data:
                     error_logger.error(f'Unrecognized protocol {initial_data}')
