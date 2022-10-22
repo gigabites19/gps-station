@@ -24,7 +24,7 @@ class Station:
     async def handle_request(self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> None:
 
         while True:
-            initial_data = await reader.read()
+            initial_data = await reader.read(1024)
             initial_data = initial_data.decode()
 
             try:
