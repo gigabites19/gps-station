@@ -27,3 +27,4 @@ class BaseCommand:
     async def send_data_downlink(self, writer: asyncio.StreamWriter, session: aiohttp.ClientSession):
         """Sends command to the device"""
         writer.write(f'{self.formatted_command}'.encode())
+        await writer.drain()

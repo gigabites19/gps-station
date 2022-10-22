@@ -27,20 +27,26 @@ class Station:
             initial_data = await reader.read(1024)
             initial_data = initial_data.decode()
 
+            print(initial_data)
+
             try:
                 protocol_object = match_protocol(initial_data)
 
                 if isinstance(protocol_object, BaseLocation):
-                    # Only save the writer if it's a location connection because that is the TCP stream we want to write commands to.
+                    # Only save the writer if it's a location connection because that is the TCP stream
+                    # we want to write commands to.
                     self.stream_writers[protocol_object.payload['device_serial_number']] = writer
                     
                     if protocol_object.gprs_blocked:
                         # clear out the alarms and make the device catch up if GPRS is blocked
-                        command = f'*HQ,{protocol_object.payload.get("device_serial_number")},R7,130305#'
-                        await writer.write(command.encode())
+                        command = f'*HQ,{protocol_object.payload.get("device_serial_number")},R7,130305#'.encode()
+                        writer.write(command)
+                        await writer.drain()
                     else:
                         await protocol_object.send_data_uplink(reader, self.session)
-                        await writer.write(b'*HQ,9172238460,R12,130305#') # responding to the device, not sure yet if necessary
+                        # responding to the device, not sure yet if necessary
+                        writer.write('*HQ,9172238460,R12,130305#'.encode())
+                        await writer.drain()
                 elif isinstance(protocol_object, BaseCommand):
                     device_writer = self.stream_writers.get(protocol_object.payload.get('device_serial_number'))
 
@@ -55,8 +61,8 @@ class Station:
                     writer.close()
                     await writer.wait_closed()
                     break
-            except Exception as e:
-                critical_logger.critical(f'Uncaught exception: {e}')
+            # except Exception as e:
+            #     critical_logger.critical(f'Uncaught exception: {e}')
 
 
 async def main():

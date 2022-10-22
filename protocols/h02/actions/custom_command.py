@@ -12,3 +12,4 @@ class CustomCommand(BaseCommand):
     
     async def send_data_downlink(self, writer: asyncio.StreamWriter, session: aiohttp.ClientSession):
         writer.write(f'{self.formatted_command}'.encode())
+        await writer.drain()
