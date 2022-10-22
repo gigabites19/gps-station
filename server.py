@@ -26,7 +26,7 @@ class Station:
         while True:
             initial_data = await reader.read(1024)
             initial_data = initial_data.decode()
-            
+
             try:
                 protocol_object = match_protocol(initial_data)
 
@@ -40,7 +40,7 @@ class Station:
                         await writer.write(command.encode())
                     else:
                         await protocol_object.send_data_uplink(reader, self.session)
-                        await write.write(b'*HQ,9172238460,R12,130305#') # responding to the device, not sure yet if necessary
+                        await writer.write(b'*HQ,9172238460,R12,130305#') # responding to the device, not sure yet if necessary
                 elif isinstance(protocol_object, BaseCommand):
                     device_writer = self.stream_writers.get(protocol_object.payload.get('device_serial_number'))
 
