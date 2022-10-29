@@ -24,9 +24,7 @@ class Location(BaseLocation):
         # This is a location data sent as a command confirmation.
         if regex_match.group(3) == 'V4':
             # Transform command confirmation data packet to look like a normal location data and
-            # also set 'is_command_confirmation' to true
             regex_match = re.match(self.LOCATION_REGEX, re.sub(r'V4,S20,(OK|DONE),\d{6}', 'V1', _raw_data))
-            self._is_command_confirmation = True
 
         self.regex_match = regex_match
         self._raw_data = _raw_data
