@@ -136,6 +136,10 @@ class Location(BaseLocation):
 
         return shock_alarm
 
+    @property
+    def _battery_cut_off(self) -> bool:
+        return self.get_bit_state(self.vehicle_status_second_byte, 4)
+
     def get_bit_state(self, hex_byte: str, attribute_bit_location: int) -> bool:
         """
         Used for getting values from hex bitmask sent in by the protocol.
