@@ -6,8 +6,8 @@ from protocols.base_command import BaseCommand
 class Command(BaseCommand):
 
     COMMANDS = {
-        r'H02,(\d{10}),CUT_FUEL': lambda device_serial_number, time: '*HQ,%s,S20,%s,1,1#' % (device_serial_number, time),
-        r'H02,(\d{10}),ENABLE_FUEL': lambda device_serial_number, time: '*HQ,%s,S20,%s,1,0#' % (device_serial_number, time),
+        r'H02,(\d{10}),CUT_FUEL': lambda device_serial_number, time: '*HQ,%s,S20,%s,0,1#' % (device_serial_number, time),
+        r'H02,(\d{10}),ENABLE_FUEL': lambda device_serial_number, time: '*HQ,%s,S20,%s,0,0#' % (device_serial_number, time),
     }
 
     def __init__(self, regex_match: re.Match, _raw_data: str) -> None:
