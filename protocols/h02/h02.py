@@ -25,3 +25,4 @@ class H02(BaseProtocol):
         # For testing
         r'custom\((\d{10})\)\((.*)\)': CustomCommand
     }
+
