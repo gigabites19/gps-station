@@ -24,8 +24,22 @@ class Station:
     async def handle_request(self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> None:
 
         while True:
-            initial_data = await reader.read(1024)
-            initial_data = initial_data.decode()
+            initial_data = await reader.readuntil(separator=b'#')  # FIXME: this assumes protocol is H02
+            try:
+                initial_data = initial_data.decode()
+            except UnicodeDecodeError:  # FIXME: this except block exists because some ST-901s send mumbo-jumbo data
+                """
+                Some ST-901s send data that can be decoded only on first packet and rest are mumbo-jumbo like the following:
+                "$0\t\x10`'\x11G8\x15\x06#AC\x182\x06\x04Dv\t\x0e\x00\x03A\xfb\xfd\xfd\xff\x00\x01\x89\xbd\x00\x00\x00\x00\x01\x1a\x14\x03+\x16\x1d5"
+
+                `.decode` method fails on this, maybe there is a way to decode this (sinotrackpro.com has no problem parsing this) but I don't have
+                time to linger on this right now
+                
+                We get what we can and then close the connection with the device, thus forcing it to reconnect and send good data again
+                """
+                writer.close()
+                await writer.wait_closed()
+                break
 
             try:
                 protocol_object = match_protocol(initial_data)
