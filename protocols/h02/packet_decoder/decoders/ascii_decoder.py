@@ -19,8 +19,13 @@ def decode_h02_ascii_packet(data_packet: bytes) -> H02Location:
 
     Raises:
         RegExMatchError: If `REGEX_PATTERN` does not match decoded `data_packet` or regex pattern in one of the `decode_{param}` functions does not match provided parameter.
+        UnicodeDecodeError: If `raw_bytes` could not be decoded by UTF-8 codec.
     """
-    raw_data = data_packet.decode() # TODO: put this in try/catch block 
+    try:
+        raw_data = data_packet.decode()
+    except UnicodeDecodeError:
+        # TODO: log this (include `raw_bytes` in the log)
+        raise
 
     match = REGEX_PATTERN.match(raw_data)
 
