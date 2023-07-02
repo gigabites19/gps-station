@@ -30,8 +30,7 @@ def decode_h02_ascii_packet(data_packet: bytes) -> H02Location:
     match = REGEX_PATTERN.match(raw_data)
 
     if match is None:
-        # TODO: raise a proper exception and log it
-        raise RegExMatchError
+        raise RegExMatchError(f'H02 protocol\'s ASCII mode pattern could not match "{raw_data}".')
 
     vehicle_status = match.group(12)
 
