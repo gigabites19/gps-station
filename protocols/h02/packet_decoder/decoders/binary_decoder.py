@@ -4,7 +4,21 @@ from protocols.h02.payloads.location_payload import H02Location
 
 from .ascii_decoder import decode_bitmask, decode_latitude, decode_longitude, decode_speed
 
-def decode_h02_binary_packet(raw_bytes: bytes):
+def decode_h02_binary_packet(raw_bytes: bytes) -> H02Location:
+    """Decode binary location data packet sent by a device that uses H02 protocol.
+
+    Decode binary data packet, also referred to as "starard mode" packet in the H02 protocol documentation.
+
+    Args:
+        raw_bytes:
+            Raw bytes sent by a device.
+
+    Returns:
+        H02Location data class that contains all necessary fields for the data packet to be saved in the backend.
+
+    Raises:
+        RegExMatchError: If one of the `decode_{param}` functions does not receive its argument in expected format.
+    """
     bytes_list = list(raw_bytes)
 
     vehicle_status = bytes_to_hex(bytes_list[0x19:0x1D])

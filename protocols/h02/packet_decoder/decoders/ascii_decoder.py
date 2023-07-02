@@ -18,7 +18,7 @@ def decode_h02_ascii_packet(data_packet: bytes) -> H02Location:
         H02Location data class that contains all necessary fields for the data packet to be saved in the backend.
 
     Raises:
-        RegExMatchError: If `REGEX_PATTERN` does not match decoded `data_packet` or regex pattern in one of the `decode_{param}` functions does not match provided parameter.
+        RegExMatchError: If `REGEX_PATTERN` does not match decoded `data_packet` or regex pattern in one of the `decode_{param}` functions does not receive parameter in expected format.
         UnicodeDecodeError: If `raw_bytes` could not be decoded by UTF-8 codec.
     """
     try:
