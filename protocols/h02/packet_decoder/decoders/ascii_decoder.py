@@ -8,6 +8,18 @@ from protocols.h02.payloads import H02Location
 REGEX_PATTERN = re.compile(r'^\*HQ,(\d{10}),(V\d),(\d{6}),(A|V),(-?\d{4}.\d{4}),(N|S),(-?\d{4,5}.\d{4}),(E|W),(\d{1,3}.\d{2}),(\d{1,3}),(\d{6}),([0-9A-Fa-f]{8}),(\d+),(\d+),(\d+),(\d+)(,\d+)?#$')
 
 def decode_h02_ascii_packet(data_packet: bytes) -> H02Location:
+    """Decode ASCII location data packet sent by a device that uses H02 protocol.
+
+    Args:
+        data_packet:
+            Raw bytes sent by a device
+
+    Returns:
+        H02Location data class that contains all necessary fields for the data packet to be saved in the backend.
+
+    Raises:
+        RegExMatchError: If `REGEX_PATTERN` does not match decoded `data_packet` or regex pattern in one of the `decode_{param}` functions does not match provided parameter.
+    """
     raw_data = data_packet.decode() # TODO: put this in try/catch block 
 
     match = REGEX_PATTERN.match(raw_data)
@@ -44,10 +56,13 @@ def decode_latitude(latitude: str) -> float:
     is `44` degrees and `31.3212` minutes.
 
     Args:
-        latitude: latitude in the H02 packet sent by the device.
+        latitude: Latitude in the H02 packet sent by the device.
 
     Returns:
         Latitude converted to a float that can be used with longitude to display a point on a map.
+
+    Raises:
+        RegExMatchError: If regex pattern does not match `latitude` parameter. 
     """
     h02_latitude_pattern = re.compile(r'^(-?\d{2})(\d{2}.\d{4})$')
     match = h02_latitude_pattern.match(latitude)
@@ -71,10 +86,13 @@ def decode_longitude(longitude: str) -> float:
     is `120` degrees and `44.2892` minutes.
 
     Args:
-        longitude: longitude in the H02 packet sent by the device.
+        longitude: Longitude in the H02 packet sent by the device.
 
     Returns:
         Longitude converted to a float that can be used with latitude to display a point on a map.
+
+    Raises:
+        RegExMatchError: If regex pattern does not match `longitude` parameter. 
     """
     h02_longitude_pattern = re.compile(r'^(-?(\d{3}|0?\d{2}))(\d{2}.\d{4})$')
     match = h02_longitude_pattern.match(longitude)
@@ -98,7 +116,7 @@ def decode_speed(speed: str) -> float:
     e.g. `speed=14` in km/h is `14 * 1.852`km/h.
 
     Args:
-        speed: speed parameter from the packet.
+        speed: Speed parameter from the packet.
 
     Returns:
         Speed converted to km/h.
