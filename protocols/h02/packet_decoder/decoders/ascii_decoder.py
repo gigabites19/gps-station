@@ -40,6 +40,9 @@ def decode_h02_ascii_packet(data_packet: bytes) -> H02Location:
 def decode_latitude(latitude: str) -> float:
     """Decode latitude sent by a H02 protocol device.
 
+    Decode H02 protocol latitude format `MMDD.DDDD` e.g. `4431.3212`
+    is `44` degrees and `31.3212` minutes.
+
     Args:
         latitude: latitude in the H02 packet sent by the device.
 
@@ -63,6 +66,9 @@ def decode_latitude(latitude: str) -> float:
 
 def decode_longitude(longitude: str) -> float:
     """Decode longitude sent by a H02 protocol device.
+
+    Decode H02 protocol latitude format `MMMDD.DDDD` e.g. `12044.2892`
+    is `120` degrees and `44.2892` minutes.
 
     Args:
         longitude: longitude in the H02 packet sent by the device.
@@ -89,12 +95,13 @@ def decode_speed(speed: str) -> float:
     """Decode speed parameter of H02 protocol.
 
     Convert and return speed of device. Convert from knots/h to km/h.
+    e.g. `speed=14` in km/h is `14 * 1.852`km/h.
 
     Args:
-        speed: speed parameter from the packet
+        speed: speed parameter from the packet.
 
     Returns:
-        Speed converted to km/h
+        Speed converted to km/h.
     """
     kmh = float(speed) * 1.852
     kmh_formatted = format(kmh, '05.2f')
@@ -118,7 +125,7 @@ def decode_bitmask(
         target_byte_order:
             Order of the target byte in the `vehicle_status`.
         target_bit_order:
-            Order of the target parameter bit in the byte (byte here means byte with order as provided by `target_byte_order` parameter)
+            Order of the target parameter bit in the byte (byte here means byte with order as provided by `target_byte_order` parameter).
 
     Returns:
         `True` if target bit is 0, `False` otherwise.
