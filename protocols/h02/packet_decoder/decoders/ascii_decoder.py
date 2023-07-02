@@ -125,7 +125,7 @@ def decode_bitmask(
 
     match target_byte_order:
         case 1:
-            byte = int(vehicle_status[0:2], 16)
+            byte = int(vehicle_status[0:2], 16) # TODO: it is not necessary to convert this to hexadecimal
         case 2:
             byte = int(vehicle_status[2:4], 16)
         case 3:
