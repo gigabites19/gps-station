@@ -72,8 +72,7 @@ def decode_latitude(latitude: str) -> float:
     match = h02_latitude_pattern.match(latitude)
 
     if match is None:
-        # TODO: create a proper exception and log it
-        raise RegExMatchError
+        raise RegExMatchError(f'Could not decode H02 protocol\'s latitude parameter: "{latitude}"') 
 
     degrees = int(match.group(1))
     minutes = float(match.group(2))
@@ -86,7 +85,7 @@ def decode_latitude(latitude: str) -> float:
 def decode_longitude(longitude: str) -> float:
     """Decode longitude sent by a H02 protocol device.
 
-    Decode H02 protocol latitude format `MMMDD.DDDD` e.g. `12044.2892`
+    Decode H02 protocol longitude format `MMMDD.DDDD` e.g. `12044.2892`
     is `120` degrees and `44.2892` minutes.
 
     Args:
@@ -102,8 +101,7 @@ def decode_longitude(longitude: str) -> float:
     match = h02_longitude_pattern.match(longitude)
 
     if match is None:
-        # TODO: create a proper exception and log it
-        raise RegExMatchError
+        raise RegExMatchError(f'Could not decode H02 protocol\'s longitude parameter: "{longitude}".') 
 
     degrees = int(match.group(1))
     minutes = float(match.group(3))
