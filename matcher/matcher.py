@@ -1,27 +1,23 @@
-import re
-from exceptions import ProtocolNotRecognized
-from protocols.base import BaseProtocol
-from protocols.h02.h02 import H02
+"""Module for simple protocol identification"""
 
+from typing import Type
+from protocols import BaseProtocol, H02Protocol
 
-protocols = {
-    # NOTE: If you change any of the regexes, also check and patch respective protocol's class, also thoroughly inspect backend and make sure nothing breaks.
-    **H02.regular_expressions
-}
+protocols = [
+    H02Protocol
+]
 
+def match_protocol(raw_bytes: bytes) -> Type[BaseProtocol] | None:
+    """Identifies protocol based on bytes sent on the stream for the first time.
 
-def match_protocol(raw_data: str) -> BaseProtocol:
+    Args:
+        raw_bytes:
+            Raw bytes sent by the device (supposedly, might be from somewhere else, in which case it should ideally be rejected).
+
+    Returns:
+        `BaseProtocol`'s subclass object.
     """
-    Iterates over the `protocols` dictionary and tries to match each regular expression key to the raw_data.
+    for protocol in protocols:
+        if protocol.bytes_is_self(raw_bytes):
+            return protocol
 
-    :param raw_data: Data sent in by the mobile station
-    :returns: Class corresponding to the data. the class later determines what kind of data it is and what to do with it.
-    :rtype: BaseProtocol
-    :raises ProtocolNotRecognized: if none of the regular expressions match the string.
-    """
-    for regexp, protocol in protocols.items():
-        pattern = re.compile(regexp)
-        match = re.match(pattern, raw_data)
-        if match:
-            return protocol(match, raw_data)
-    raise ProtocolNotRecognized(raw_data)

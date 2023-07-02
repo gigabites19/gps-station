@@ -1,28 +1,29 @@
-from protocols.base import BaseProtocol
-from .actions.location import Location
-from .actions.command import Command
-from .actions.custom_command import CustomCommand
+from protocols import BaseProtocol
+from .packet_decoder import H02PacketDecoder
 
+class H02Protocol(BaseProtocol):
+    @property
+    def packet_decoder(self) -> H02PacketDecoder:
+        return H02PacketDecoder()
 
-class H02(BaseProtocol):
-    """
-    Class for H02 protocol.
+    @staticmethod
+    def bytes_is_self(raw_bytes: bytes) -> bool:
+        return raw_bytes.startswith((b'*', b'$'))
 
-    :param _protocol: Protocol's name, will be sent to the backend server.
-    :type _protocol: str
-    :param regular_expressions: regular expressions of the protocol that match classes that perform actions linked with this protocol
-    :type regular_expressions: dict
-    """
+    async def loop(self):
+        while True:
+            initial_data = await self.stream_reader.read(128)
 
-    # TODO: force all subclasses to have some attributes defined
-    _protocol: str = "H02"
+            if initial_data == b'':
+                print("Client disconnected: ", self.stream_writer.get_extra_info('peername'))  # TODO: change to log
+                self.stream_writer.close()
+                await self.stream_writer.wait_closed()
+                break
+                #  TODO: exception should be raised so writer can be deleted by the station
 
-    # TODO: test that all protocols define those with protocol name appended in front for dictionary key
-    regular_expressions: dict = {
-        r'^\*([A-Z]+),(\d{10}),(V\d),(\d{6}),(A|B|V),(-?\d{4}.\d{4}),(N|S),(-?\d{4,5}.\d{4}),(E|W),(\d{1,3}.\d{2}),(\d{1,3}),(\d{6}),([0-9A-Fa-f]+),(\d+),(\d+),(\d+),(\d+)(,\d+\D?)?#$': Location,
-        r'^\*([A-Z]+),(\d{10}),(V\d),(S\d+),(OK|DONE),(\d{6}),(\d{6}),(A|B|V),(-?\d{4}.\d{4}),(N|S),(-?\d{4,5}.\d{4}),(E|W),(\d{1,3}.\d{2}),(\d{1,3}),(\d{6}),([0-9A-Fa-f]+),(\d+),(\d+),(\d+),(\d+)(,\d+\D?)?#$': Location,
-        r'^H02,(\d{10}),(CUT_FUEL|ENABLE_FUEL)$': Command,
-        # For testing
-        r'custom\((\d{10})\)\((.*)\)': CustomCommand
-    }
+            # TODO: add try/catch block and error counter, if it exceeds threshold then
+            # TODO: stop this loop. if eceptions raised from `packet_decoder.decode` are
+            # TODO: hitting this loop often, it means something is wrong and needs attention.
+            payload = self.packet_decoder.decode(initial_data)
+            print(payload)
 

@@ -1,41 +1,68 @@
-from re import Match
-from .exceptions import AttributeNotSet
+from abc import ABC, abstractmethod
+import asyncio
+ 
+from .packet_decoder import BasePacketDecoder
 
+class BaseProtocol(ABC):
+    """Blueprint for all other protocols to build upon.
 
-class BaseProtocol:
+    Meant to provide a common interface for concrete implementations of various GPS protocols.
+    `packet_decoder` must be defined as a property because it is a mandatory
+    attribute for `BaseProtocol` subclass' initialization and python does not provide a way to forbid
+    class initialization if it does not implement certain attributes, but it does provide a way
+    to do that for methods using `abstractmethod` decorator.
+ 
+    Attributes:
+        stream_writer:
+            `asyncio.StreamWriter` instance used to send data to device.
+        stream_reader:
+            `asyncio.StreamReader` instance used to await and read data sent by devices.
+        packet_decoder:
+            instance of `BasePacketDecoder`'s subclass used to decode data packets sent by device.
     """
-    Base class that all the other protocols should inherit from.
 
-    All subclasses should define attributes that will be sent to the server with
-    one preceding underscore (_). If attribute requires any further processing after
-    getting it from regex group, then it should be defined as a @property, the property
-    name should also start with an underscore.
+    def __init__(self, stream_reader: asyncio.StreamReader, stream_writer: asyncio.StreamWriter) -> None:
+        self.stream_reader = stream_reader
+        self.stream_writer = stream_writer
 
-    :param required_sublass_attributes: Attributes that subclasses must define
-    :type required_sublass_attributes: list
-    """
+    @property
+    @abstractmethod
+    def packet_decoder(self) -> BasePacketDecoder:
+        """Return instance of `BasePacketDecoder`'s subclass."""
+        pass
 
-    required_subclass_attributes: list = ['_protocol', 'regular_expressions']
+    @staticmethod
+    @abstractmethod
+    def bytes_is_self(raw_bytes: bytes) -> bool:
+        """Determine if bytes belong to calling `BaseProtocol`'s subclass.
 
-    def __init__(self) -> None:
+        Determine if given list of bytes belong to calling `BaseProtocol`'s subclass.
+        Intended usage pseudo code:
+        ```python
+        bytes = reader.read(100)
+
+        if SomeProtocol::bytes_is_self(bytes):
+            SomeProtocol(reader, writer, ...)
+        ```
+
+        Args:
+            raw_bytes:
+                raw bytes sent by a device.
+
+        Returns:
+            Either `True` or `False`.
         """
-        Initializes the base parameters and checks that the subclass' instance and thus
-        the subclass itself has defined required attributes.
+        pass
 
-        :rtype: None
-        """
-        self.check_subclass_attributes()
+    @abstractmethod
+    async def loop(self) -> None:
+        """Continously read, process and deliver data packets sent by a device.
 
-    # TODO: test that this is always enforced
-    def check_subclass_attributes(self) -> None:
+        Read device data, process it and send it to the backend for storage.
+        This method should only be called when you are sure that appropriate protocol
+        has been correctly identified.
+        Each subclass is responsible for closing the connection, keeping connections active
+        longer than necessary will use up underlying system's file descriptors.
         """
-        Checks that the instance's class has defined all the required attributes
+        pass
 
-        :raises AttributeNotSet: In case one of the required attributes is not defined
-        :rtype: None
-        """
-        for attribute in self.required_subclass_attributes:
-            try:
-                getattr(self, attribute)
-            except AttributeError:
-                raise AttributeNotSet(attribute)
