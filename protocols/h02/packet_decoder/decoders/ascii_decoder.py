@@ -153,13 +153,13 @@ def decode_bitmask(
 
     match target_byte_order:
         case 1:
-            byte = int(vehicle_status[0:2], 16) # TODO: it is not necessary to convert this to hexadecimal
+            byte = int(vehicle_status[0:2])
         case 2:
-            byte = int(vehicle_status[2:4], 16)
+            byte = int(vehicle_status[2:4])
         case 3:
-            byte = int(vehicle_status[4:6], 16)
+            byte = int(vehicle_status[4:6])
         case 4:
-            byte = int(vehicle_status[6:8], 16)
+            byte = int(vehicle_status[6:8])
 
     mask = 0b1 << target_bit_order - 1
 
