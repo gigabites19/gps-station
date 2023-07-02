@@ -1,6 +1,8 @@
 import re
 from typing import Literal
 
+from protocols.exceptions import RegExMatchError
+
 from protocols.h02.payloads import H02Location
 
 REGEX_PATTERN = re.compile(r'^\*HQ,(\d{10}),(V\d),(\d{6}),(A|V),(-?\d{4}.\d{4}),(N|S),(-?\d{4,5}.\d{4}),(E|W),(\d{1,3}.\d{2}),(\d{1,3}),(\d{6}),([0-9A-Fa-f]{8}),(\d+),(\d+),(\d+),(\d+)(,\d+)?#$')
@@ -12,7 +14,7 @@ def decode_h02_ascii_packet(data_packet: bytes) -> H02Location:
 
     if match is None:
         # TODO: raise a proper exception and log it
-        raise Exception('A')
+        raise RegExMatchError
 
     vehicle_status = match.group(12)
 
@@ -49,7 +51,7 @@ def decode_latitude(latitude: str) -> float:
 
     if match is None:
         # TODO: create a proper exception and log it
-        raise Exception('A')
+        raise RegExMatchError
 
     degrees = int(match.group(1))
     minutes = float(match.group(2))
@@ -73,7 +75,7 @@ def decode_longitude(longitude: str) -> float:
 
     if match is None:
         # TODO: create a proper exception and log it
-        raise Exception('A')
+        raise RegExMatchError
 
     degrees = int(match.group(1))
     minutes = float(match.group(3))
