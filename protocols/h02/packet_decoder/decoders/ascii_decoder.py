@@ -24,7 +24,6 @@ def decode_h02_ascii_packet(data_packet: bytes) -> H02Location:
     try:
         raw_data = data_packet.decode()
     except UnicodeDecodeError:
-        # TODO: log this (include `raw_bytes` in the log)
         raise
 
     match = REGEX_PATTERN.match(raw_data)
