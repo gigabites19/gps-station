@@ -20,8 +20,8 @@ class H02PacketDecoder(BasePacketDecoder):
 
         Raises:
             BadProtocolError: If data packet begins unexpectedly (Neither '*' nor '$').
-            UnicodeDecodeError: If ASCII mode can not be decoded properly.
-            RegExMatchError: If one of the decoders fail to decode a certain parameter (they use regular expressions internally).
+            UnicodeDecodeError: If ASCII mode data packet can not be decoded properly.
+            RegExMatchError: If one of the decoders fail to decode a certain parameter (both in ASCII and Standard modes, both use regular expressions internally).
         """
         try:
             if raw_bytes.startswith(b'*'):
