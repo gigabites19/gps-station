@@ -7,6 +7,11 @@ from .decoders import decode_h02_ascii_packet, decode_h02_binary_packet
 
 
 class H02PacketDecoder(BasePacketDecoder):
+    """Packet decoder implementation for H02 protocol.
+
+    This if data packet is in 'standard' mode or 'binary' mode and calls
+    appropriate function based on that.
+    """
 
     def decode(self, raw_bytes: bytes) -> H02Location:
         """Decode location packet sent by a device using H02 protocol.
