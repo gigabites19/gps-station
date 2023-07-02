@@ -90,6 +90,9 @@ def decode_speed(speed: str) -> float:
 
     Args:
         speed: speed parameter from the packet
+
+    Returns:
+        Speed converted to km/h
     """
     kmh = float(speed) * 1.852
     kmh_formatted = format(kmh, '05.2f')
