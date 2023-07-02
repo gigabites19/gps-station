@@ -1,13 +1,11 @@
 """Module for exceptions that can occur when working with various protocols."""
 
 
-# TODO: display pattern that did not match data
 class RegExMatchError(Exception):
     """Regular expression has no match in a piece of data."""
     pass
 
 
-# TODO: display data that that caused this error
 class BadProtocolError(Exception):
     """Protocol data structured in an unexpected way.
 
