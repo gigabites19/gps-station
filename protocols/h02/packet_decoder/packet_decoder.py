@@ -15,8 +15,7 @@ class H02PacketDecoder(BasePacketDecoder):
             elif raw_bytes.startswith(b'$'):
                 return decode_h02_binary_packet(raw_bytes)
             else:
-                # TODO: log this
-                raise BadProtocolError
+                raise BadProtocolError(f'Expected H02 packet to start with either "*" or "$" instead got (bytes): {list(raw_bytes)}')
         except (UnicodeDecodeError, RegExMatchError, BadProtocolError):
             raise
 
