@@ -3,7 +3,7 @@ from protocols import BaseProtocol
 from .packet_decoder import H02PacketDecoder
 
 class H02Protocol(BaseProtocol):
-    """Implementation of H02 protocol, mostly used by ST-901 trackers by SinoTrack."""
+    """Implementation of H02 protocol, used by SinoTrack ST-901 trackers."""
 
     @property
     def packet_decoder(self) -> H02PacketDecoder:
