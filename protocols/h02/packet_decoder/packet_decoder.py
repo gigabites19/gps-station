@@ -1,5 +1,4 @@
 from protocols.packet_decoder import BasePacketDecoder
-
 from protocols.exceptions import RegExMatchError, BadProtocolError
 
 from protocols.h02.payloads import H02Location
