@@ -29,9 +29,9 @@ class BaseProtocol(ABC):
         self.stream_writer = stream_writer
         self.client_session = session
 
-    @staticmethod
+    @classmethod
     @abstractmethod
-    def bytes_is_self(raw_bytes: bytes) -> bool:
+    def bytes_is_self(cls, raw_bytes: bytes) -> bool:
         """Determine if bytes belong to calling `BaseProtocol`'s subclass.
 
         Determine if given list of bytes belong to calling `BaseProtocol`'s subclass.
