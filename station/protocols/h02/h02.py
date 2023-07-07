@@ -57,5 +57,5 @@ class H02Protocol(BaseProtocol):
             pass
             # TODO: log, because something went wrong. this method's failure is SMS-notification worthy.
         else:
-            print("Sending data uplink", location_payload.device_serial_number)
+            print("Sent data uplink. IMEI:", location_payload.device_serial_number)
 
