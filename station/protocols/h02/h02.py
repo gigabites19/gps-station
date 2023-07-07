@@ -1,4 +1,5 @@
 from protocols import BaseProtocol
+from protocols.exceptions import RegExMatchError, BadProtocolError
 
 from .packet_decoder import H02PacketDecoder
 from .payloads import H02Location
@@ -6,13 +7,18 @@ from .payloads import H02Location
 class H02Protocol(BaseProtocol):
     """Implementation of H02 protocol, used by SinoTrack ST-901 trackers."""
 
-    @property
-    def packet_decoder(self) -> H02PacketDecoder:
-        return H02PacketDecoder()
+    packet_decoder: H02PacketDecoder = H02PacketDecoder()
 
-    @staticmethod
-    def bytes_is_self(raw_bytes: bytes) -> bool:
-        return raw_bytes.startswith((b'*', b'$'))
+    @classmethod
+    def bytes_is_self(cls, raw_bytes: bytes) -> bool:
+        try:
+            cls.packet_decoder.decode(raw_bytes)
+        except (RegExMatchError, BadProtocolError, UnicodeDecodeError) as e:
+            #  TODO: log this
+            print(f'Could not decode initial bytes sent by a connected device(?). {e.__class__.__name__}: {e}')
+            return False
+        else:
+            return True
 
     async def loop(self):
         while True:
@@ -41,4 +47,3 @@ class H02Protocol(BaseProtocol):
         else:
             print("Sending data uplink", location_payload.device_serial_number)
 
-          
