@@ -20,9 +20,15 @@ class BaseProtocol(ABC):
             `asyncio.StreamReader` instance used to await and read data sent by devices.
         session:
             Aiohttp session shared by all `BaseProtocol` instances, used to send data uplink.
+        exception_counter:
+            Number of exceptions caught during lifetime of the connection - each exception increments this attribute by 1.
+        exception_threshold:
+            Maximum value `exception_counted` is allowed to reach, connection is closed threshold value is reached.
     """
 
     packet_decoder: BasePacketDecoder
+    exception_counter: int = 0
+    exception_threshold: int = 10
 
     def __init__(self, stream_reader: asyncio.StreamReader, stream_writer: asyncio.StreamWriter, session: aiohttp.ClientSession) -> None:
         self.stream_reader = stream_reader
@@ -75,3 +81,8 @@ class BaseProtocol(ABC):
                 A `BaseLocationPayload` subclass' instance containing all formatted location data that is stored in database.
         """
         pass
+    
+    async def terminate_connection(self) -> None:
+        self.stream_writer.close()
+        await self.stream_writer.wait_closed()
+
