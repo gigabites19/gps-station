@@ -25,9 +25,9 @@ class H02Protocol(BaseProtocol):
 
         while True:
             initial_data = await self.stream_reader.read(128)
-
+    
             if initial_data == b'':
-                print(f'Client disconnected. ({client_address}:{client_port} - {self.__class__.__name__}).', )  # TODO: change to log
+                print(f'Client disconnected. ({client_address}:{client_port} - {self.__class__.__name__}).')  # TODO: change to log
                 await self.terminate_connection()
                 break
                 #  TODO: exception should be raised so writer can be deleted by the station
