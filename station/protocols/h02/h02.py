@@ -35,6 +35,7 @@ class H02Protocol(BaseProtocol):
             try:
                 payload = self.packet_decoder.decode(initial_data)
             except (RegExMatchError, BadProtocolError, UnicodeDecodeError) as e:
+                # TODO: log this exception
                 print(f'Could not decode bytes sent by a connected device(?). {e.__class__.__name__}: {e}')
                 self.exception_counter += 1
             except Exception:
@@ -57,6 +58,4 @@ class H02Protocol(BaseProtocol):
         if response.status != 201:
             pass
             # TODO: log, because something went wrong. this method's failure is SMS-notification worthy.
-        else:
-            print("Sent data uplink. IMEI:", location_payload.device_serial_number)
 
