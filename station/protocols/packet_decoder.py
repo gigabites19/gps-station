@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 
 from .payloads import BaseLocationPayload
 
+
 class BasePacketDecoder(ABC):
     """Abstract base class for protocol packet decoders.
 
