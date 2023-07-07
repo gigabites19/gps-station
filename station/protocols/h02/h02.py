@@ -30,12 +30,15 @@ class H02Protocol(BaseProtocol):
             # TODO: hitting this loop often, it means something is wrong and needs attention.
             payload = self.packet_decoder.decode(initial_data)
             
-            await self.send_downlink(payload)
+            await self.send_uplink(payload)
 
-    async def send_downlink(self, location_payload: H02Location) -> None:
+    async def send_uplink(self, location_payload: H02Location) -> None:
         response = await self.client_session.post('http://localhost:8000/tracker/add-location/', data=location_payload.__dict__)
 
         if response.status != 201:
+            pass
             # TODO: log, because something went wrong. this method's failure is SMS-notification worthy.
+        else:
+            print("Sending data uplink", location_payload.device_serial_number)
 
           
