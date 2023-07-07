@@ -58,4 +58,7 @@ class H02Protocol(BaseProtocol):
         if response.status != 201:
             pass
             # TODO: log, because something went wrong. this method's failure is SMS-notification worthy.
+        else:
+            # FIXME: remove once not debugging
+            print(location_payload.__dict__)
 
