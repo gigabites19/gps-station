@@ -37,7 +37,7 @@ class H02Protocol(BaseProtocol):
                 self.exception_counter += 1
             except Exception:
                 self.exception_counter += 1
-                # Unexpected exceptions should also increment `exception_counter` but they must also bubble up
+                # Unexpected exceptions should also increment `exception_counter` but, unlike expected ones, they should also bubble up
                 raise
             else:
                 await self.send_uplink(payload)
