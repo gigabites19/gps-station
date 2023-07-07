@@ -1,6 +1,7 @@
 from protocols import BaseProtocol
 
 from .packet_decoder import H02PacketDecoder
+from .payloads import H02Location
 
 class H02Protocol(BaseProtocol):
     """Implementation of H02 protocol, used by SinoTrack ST-901 trackers."""
@@ -28,5 +29,13 @@ class H02Protocol(BaseProtocol):
             # TODO: stop this loop. if eceptions raised from `packet_decoder.decode` are
             # TODO: hitting this loop often, it means something is wrong and needs attention.
             payload = self.packet_decoder.decode(initial_data)
-            print(payload)
+            
+            await self.send_downlink(payload)
 
+    async def send_downlink(self, location_payload: H02Location) -> None:
+        response = await self.client_session.post('http://localhost:8000/tracker/add-location/', data=location_payload.__dict__)
+
+        if response.status != 201:
+            # TODO: log, because something went wrong. this method's failure is SMS-notification worthy.
+
+          

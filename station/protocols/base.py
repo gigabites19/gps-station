@@ -73,7 +73,7 @@ class BaseProtocol(ABC):
         pass
 
     @abstractmethod
-    async def send_downlink(self, location_payload: BaseLocationPayload) -> None:
+    async def send_uplink(self, location_payload: BaseLocationPayload) -> None:
         """Send location data to backend.
 
         Sends location data to backend for long-term storage.
