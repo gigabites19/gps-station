@@ -13,8 +13,8 @@ load_dotenv()
 
 class Station:
 
-    def __init__(self, backend_address: str) -> None:
-        self.session = aiohttp.ClientSession()
+    def __init__(self, backend_address: str, client_session: aiohttp.ClientSession) -> None:
+        self.client_session = client_session
         self.backend_address = backend_address
         self.stream_writers = {}
 
@@ -27,7 +27,7 @@ class Station:
 
         if protocol is not None:
             print(f'Identified protocol of newly connected client. ({client_address}:{client_port} - {protocol.__name__}).')  # TODO: change to log
-            protocol_instance = protocol(reader, writer, self.session)
+            protocol_instance = protocol(reader, writer, self.client_session)
             await protocol_instance.loop()
         else:
             print(f'Could not identify protocol for client. Closing connection. ({client_address}:{client_port}).')  # TODO: change to log. send sms?
@@ -35,7 +35,8 @@ class Station:
             await writer.wait_closed()
 
 async def main(backend_address: str):
-    station = Station(backend_address)
+    client_session = aiohttp.ClientSession()
+    station = Station(backend_address, client_session)
 
     server = await asyncio.start_server(station.handle_request, '', 8090)
 
