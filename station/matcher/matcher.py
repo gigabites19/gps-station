@@ -18,6 +18,11 @@ def match_protocol(raw_bytes: bytes) -> Type[BaseProtocol] | None:
         `BaseProtocol`'s subclass object.
     """
     for protocol in protocols:
-        if protocol.bytes_is_self(raw_bytes):
-            return protocol
+        try:
+            bytes_is_protocol = protocol.bytes_is_self(raw_bytes)
+        except Exception as e:
+            # TODO: log this to a file
+            print(f'Got an unexpected exception when identifying protocol. {e.__class__.__name__}: {e}')
+        else:
+            return protocol if bytes_is_protocol == True else None
 
