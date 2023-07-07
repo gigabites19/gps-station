@@ -18,4 +18,5 @@ class H02Location(BaseLocationPayload):
     cut_fuel: bool
     shock_alarm: bool
     battery_cut_off: bool
+    protocol: str = 'H02'
 
