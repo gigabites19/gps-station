@@ -9,7 +9,7 @@ from .decoders import decode_h02_ascii_packet, decode_h02_binary_packet
 class H02PacketDecoder(BasePacketDecoder):
     """Packet decoder implementation for H02 protocol.
 
-    This if data packet is in 'standard' mode or 'binary' mode and calls
+    This class identifies if data packet is in 'standard' mode or 'binary' mode and calls
     appropriate function based on that.
     """
 
