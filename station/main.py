@@ -13,9 +13,9 @@ load_dotenv()
 
 class Station:
 
-    def __init__(self, session: aiohttp.ClientSession, server_address: str) -> None:
+    def __init__(self, session: aiohttp.ClientSession, backend_address: str) -> None:
         self.session = session
-        self.server_address = server_address
+        self.backend_address = backend_address
         self.stream_writers = {}
 
     async def handle_request(self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> None:
@@ -34,14 +34,9 @@ class Station:
             writer.close()
             await writer.wait_closed()
 
-async def main():
-    session = aiohttp.ClientSession()
-    server_address = os.getenv('BACKEND_URL')
-
-    if server_address is None:
-        raise Exception("Server address is not defined.")
-
-    station = Station(session, server_address)
+async def main(backend_address: str):
+    client_session = aiohttp.ClientSession()
+    station = Station(client_session, backend_address)
 
     server = await asyncio.start_server(station.handle_request, '', 8090)
 
@@ -51,7 +46,12 @@ async def main():
     async with server:
         await server.serve_forever()
 
+if __name__ == '__main__':
+    backend_address = os.getenv('BACKEND_URL')
 
-if __name__ == "__main__":
-    asyncio.run(main())
+    if backend_address is None:
+        raise Exception('Backend address is not defined.'
+                        'Define "BACKEND_URL" variable in the environment that you are trying to run Station in.')
+
+    asyncio.run(main(backend_address))
 
