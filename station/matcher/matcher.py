@@ -1,5 +1,3 @@
-"""Module for simple protocol identification"""
-
 from typing import Type
 from protocols import BaseProtocol, H02Protocol
 
