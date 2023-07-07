@@ -1,7 +1,10 @@
 from abc import ABC, abstractmethod
 import asyncio
+
+import aiohttp
  
 from .packet_decoder import BasePacketDecoder
+from .payloads import BaseLocationPayload
 
 class BaseProtocol(ABC):
     """Blueprint for all other protocols to build upon.
@@ -19,11 +22,14 @@ class BaseProtocol(ABC):
             `asyncio.StreamReader` instance used to await and read data sent by devices.
         packet_decoder:
             instance of `BasePacketDecoder`'s subclass used to decode data packets sent by device.
+        session:
+            Aiohttp session shared by all `BaseProtocol` instances, used to send data uplink.
     """
 
-    def __init__(self, stream_reader: asyncio.StreamReader, stream_writer: asyncio.StreamWriter) -> None:
+    def __init__(self, stream_reader: asyncio.StreamReader, stream_writer: asyncio.StreamWriter, session: aiohttp.ClientSession) -> None:
         self.stream_reader = stream_reader
         self.stream_writer = stream_writer
+        self.client_session = session
 
     @property
     @abstractmethod
@@ -66,3 +72,14 @@ class BaseProtocol(ABC):
         """
         pass
 
+    @abstractmethod
+    async def send_downlink(self, location_payload: BaseLocationPayload) -> None:
+        """Send location data to backend.
+
+        Sends location data to backend for long-term storage.
+
+        Args:
+            location_payload:
+                A `BaseLocationPayload` subclass' instance containing all formatted location data that is stored in database.
+        """
+        pass
