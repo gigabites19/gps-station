@@ -26,17 +26,28 @@ class H02Protocol(BaseProtocol):
 
             if initial_data == b'':
                 print("Client disconnected: ", self.stream_writer.get_extra_info('peername'))  # TODO: change to log
-                self.stream_writer.close()
-                await self.stream_writer.wait_closed()
+                await self.terminate_connection()
                 break
                 #  TODO: exception should be raised so writer can be deleted by the station
 
-            # TODO: add try/catch block and error counter, if it exceeds threshold then
-            # TODO: stop this loop. if exceptions raised from `packet_decoder.decode` are
-            # TODO: hitting this loop often, it means something is wrong and needs attention.
-            payload = self.packet_decoder.decode(initial_data)
-            
-            await self.send_uplink(payload)
+            try:
+                payload = self.packet_decoder.decode(initial_data)
+            except (RegExMatchError, BadProtocolError, UnicodeDecodeError) as e:
+                print(f'Could not decode initial bytes sent by a connected device(?). {e.__class__.__name__}: {e}')
+                self.exception_counter += 1
+            except Exception:
+                self.exception_counter += 1
+                # Unexpected exceptions should also increment `exception_counter` but they must also bubble up
+                raise
+            else:
+                await self.send_uplink(payload)
+
+            if self.exception_counter >= self.exception_threshold:
+                client_address, client_port = self.stream_writer.get_extra_info('peername')
+                # TODO: log this
+                print(f'Closing connection with client because exception threshold was reached. ({client_address}:{client_port} - {self.__class__.__name__})')
+                await self.terminate_connection()
+                break
 
     async def send_uplink(self, location_payload: H02Location) -> None:
         # TODO: replace `localhost:8000` with actual backend address defined in the environment
