@@ -32,13 +32,14 @@ class H02Protocol(BaseProtocol):
                 #  TODO: exception should be raised so writer can be deleted by the station
 
             # TODO: add try/catch block and error counter, if it exceeds threshold then
-            # TODO: stop this loop. if eceptions raised from `packet_decoder.decode` are
+            # TODO: stop this loop. if exceptions raised from `packet_decoder.decode` are
             # TODO: hitting this loop often, it means something is wrong and needs attention.
             payload = self.packet_decoder.decode(initial_data)
             
             await self.send_uplink(payload)
 
     async def send_uplink(self, location_payload: H02Location) -> None:
+        # TODO: replace `localhost:8000` with actual backend address defined in the environment
         response = await self.client_session.post('http://localhost:8000/tracker/add-location/', data=location_payload.__dict__)
 
         if response.status != 201:
