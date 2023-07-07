@@ -46,7 +46,7 @@ class H02Protocol(BaseProtocol):
 
             if self.exception_counter >= self.exception_threshold:
                 # TODO: log this
-                print(f'Closing connection with client because exception threshold was reached. ({client_address}:{client_port} - {self.__class__.__name__})')
+                print(f'Closing connection with client because exception threshold of {self.exception_threshold} was reached. ({client_address}:{client_port} - {self.__class__.__name__})')
                 await self.terminate_connection()
                 break
 
