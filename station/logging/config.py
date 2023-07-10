@@ -16,7 +16,7 @@ def get_filter_for_handler(handler_level: Literal[20, 30, 40, 50]) -> Callable[[
             returned by this function.
 
     Returns:
-        A filter object that accepts logging record as first and only parameter.
+        A filter function that accepts logging record as first and only parameter.
         https://docs.python.org/3/library/logging.html#logging.Handler.filter
     """
     def filter_func(record: logging.LogRecord):
