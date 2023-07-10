@@ -29,7 +29,7 @@ config = {
 
     'formatters': {
         'basic_formatter': {
-            'format': '%(asctime)s - %(message)s'
+            'format': '%(asctime)s %(levelname)s - %(message)s'
         }
     },
     
