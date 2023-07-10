@@ -1,4 +1,7 @@
+import sys
 from typing import Type
+
+from logger import logger
 from protocols import BaseProtocol, H02Protocol
 
 protocols = [
@@ -19,8 +22,9 @@ def match_protocol(raw_bytes: bytes) -> Type[BaseProtocol] | None:
         try:
             bytes_is_protocol = protocol.bytes_is_self(raw_bytes)
         except Exception as e:
-            # TODO: log this to a file
-            print(f'Got an unexpected exception when identifying protocol. {e.__class__.__name__}: {e}')
+            # Every failure of `protocol.bytes_is_self` should get handled in there.
+            # If an exception reaches this `except` block it means something unexpected happened and needs to be addressed urengtly.
+            logger.critical(f'Got an unexpected exception when identifying protocol. {e.__class__.__name__}: {e}', exc_info=sys.exc_info()) # TODO: this is SMS worthy
         else:
             return protocol if bytes_is_protocol == True else None
 
