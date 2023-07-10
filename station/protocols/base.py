@@ -10,6 +10,9 @@ class BaseProtocol(ABC):
     """Blueprint for all other protocols to build upon.
 
     Meant to provide a common interface for concrete implementations of various GPS protocols.
+    `BaseProtocol` should never be instantiated directly, instead it defines the interface
+    that all protocol implementations should have and establishes some default behavior that
+    child classes can use (or override).
  
     Attributes:
         packet_decoder:
