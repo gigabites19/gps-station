@@ -5,8 +5,8 @@ from typing import Type
 import aiohttp
 from dotenv import load_dotenv
 
-from protocols import BaseProtocol
 from matcher import match_protocol
+from protocols import BaseProtocol
 
 load_dotenv()
 
