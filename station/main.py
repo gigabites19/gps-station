@@ -5,6 +5,7 @@ from typing import Type
 import aiohttp
 from dotenv import load_dotenv
 
+from logger import logger
 from matcher import match_protocol
 from protocols import BaseProtocol
 
@@ -20,17 +21,17 @@ class Station:
 
     async def handle_request(self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> None:
         client_address, client_port = writer.get_extra_info('peername')
-        print(f'Client connected. ({client_address}:{client_port})')  # TODO: change to log
+        logger.info(f'Client connected. ({client_address}:{client_port})')
 
         initial_data = await reader.read(512)
         protocol: Type[BaseProtocol] | None = match_protocol(initial_data)
 
         if protocol is not None:
-            print(f'Identified protocol of newly connected client. ({client_address}:{client_port} - {protocol.__name__}).')  # TODO: change to log
+            logger.info(f'Identified protocol of newly connected client. ({client_address}:{client_port} - {protocol.__name__}).')
             protocol_instance = protocol(reader, writer, self.client_session)
             await protocol_instance.loop()
         else:
-            print(f'Could not identify protocol for client. Closing connection. ({client_address}:{client_port}).')  # TODO: change to log. send sms?
+            logger.warning(f'Could not identify protocol of newly connected client. Closing connection. ({client_address}:{client_port}). data (in bytes): {list(initial_data)}')
             writer.close()
             await writer.wait_closed()
 
@@ -41,7 +42,7 @@ async def main(backend_address: str):
     server = await asyncio.start_server(station.handle_request, '', 8090)
 
     address = server.sockets[0].getsockname()
-    print(f'Serving on {address}')
+    logger.info(f'Serving on {address}')
 
     async with server:
         await server.serve_forever()
