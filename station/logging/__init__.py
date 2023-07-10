@@ -1,4 +1,5 @@
 """Package that contains all logging-related configuration of this project."""
+
 import logging
 from logging.config import dictConfig
 
