@@ -1,3 +1,4 @@
+from logger import logger
 from protocols import BaseProtocol
 from protocols.exceptions import RegExMatchError, BadProtocolError
 
@@ -14,8 +15,7 @@ class H02Protocol(BaseProtocol):
         try:
             cls.packet_decoder.decode(raw_bytes)
         except (RegExMatchError, BadProtocolError, UnicodeDecodeError) as e:
-            #  TODO: log this
-            print(f'Could not decode initial bytes sent by a connected device(?). {e.__class__.__name__}: {e}')
+            logger.warning(f'Could not decode initial bytes sent by a connected device(?). {e.__class__.__name__}: {e}')
             return False
         else:
             return True
@@ -27,7 +27,7 @@ class H02Protocol(BaseProtocol):
             initial_data = await self.stream_reader.read(128)
 
             if initial_data == b'':
-                print(f'Client disconnected. ({client_address}:{client_port} - {self.__class__.__name__}).')  # TODO: change to log
+                logger.info(f'Client closed connection. ({client_address}:{client_port} - {self.__class__.__name__}).')
                 await self.terminate_connection()
                 break
                 #  TODO: exception should be raised so writer can be deleted by the station
@@ -35,8 +35,7 @@ class H02Protocol(BaseProtocol):
             try:
                 payload = self.packet_decoder.decode(initial_data)
             except (RegExMatchError, BadProtocolError, UnicodeDecodeError) as e:
-                # TODO: log this exception
-                print(f'Could not decode bytes sent by a connected device(?). {e.__class__.__name__}: {e}')
+                logger.warning(f'Could not decode bytes sent by a connected device(?). {e.__class__.__name__}: {e}')
                 self.exception_counter += 1
             except Exception:
                 self.exception_counter += 1
@@ -46,8 +45,7 @@ class H02Protocol(BaseProtocol):
                 await self.send_uplink(payload)
 
             if self.exception_counter >= self.exception_threshold:
-                # TODO: log this
-                print(f'Closing connection with client because exception threshold of {self.exception_threshold} was reached. ({client_address}:{client_port} - {self.__class__.__name__})')
+                logger.warning(f'Closing connection with client because exception threshold of {self.exception_threshold} was reached. ({client_address}:{client_port} - {self.__class__.__name__})')
                 await self.terminate_connection()
                 break
 
@@ -56,9 +54,5 @@ class H02Protocol(BaseProtocol):
         response = await self.client_session.post('http://localhost:8000/tracker/add-location/', data=location_payload.__dict__)
 
         if response.status != 201:
-            pass
-            # TODO: log, because something went wrong. this method's failure is SMS-notification worthy.
-        else:
-            # FIXME: remove once not debugging
-            print(location_payload.__dict__)
+            logger.critical(f'Backend returned unexpected status code. Could not save payload. Status code: {response.status}. Payload: {location_payload}')
 
