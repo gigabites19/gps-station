@@ -49,9 +49,3 @@ class H02Protocol(BaseProtocol):
                 await self.terminate_connection()
                 break
 
-    async def send_uplink(self, location_payload: H02Location) -> None:
-        response = await self.client_session.post(self.backend_url, data=location_payload.__dict__)
-
-        if response.status != 201:
-            logger.critical(f'Backend returned unexpected status code. Could not save payload. Status code: {response.status}. Payload: {location_payload}')
-

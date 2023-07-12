@@ -2,6 +2,8 @@ from abc import ABC, abstractmethod
 import asyncio
 
 import aiohttp
+
+from logger import logger
  
 from .packet_decoder import BasePacketDecoder
 from .payloads import BaseLocationPayload
@@ -82,19 +84,19 @@ class BaseProtocol(ABC):
         """
         pass
 
-    @abstractmethod
+    async def terminate_connection(self) -> None:
+        self.stream_writer.close()
+        await self.stream_writer.wait_closed()
+
     async def send_uplink(self, location_payload: BaseLocationPayload) -> None:
-        """Send location data to backend.
-
-        Sends location data to backend for long-term storage.
-
+        """Sent location data to backend.
+        
         Args:
             location_payload:
                 A `BaseLocationPayload` subclass' instance containing all formatted location data that is stored in database.
         """
-        pass
-    
-    async def terminate_connection(self) -> None:
-        self.stream_writer.close()
-        await self.stream_writer.wait_closed()
+        response = await self.client_session.post(self.backend_url, data=location_payload.__dict__)
+
+        if response.status != 201:
+            logger.critical(f'Backend returned unexpected status code. Could not save payload. Status code: {response.status}. Payload: {location_payload}')
 
