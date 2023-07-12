@@ -49,11 +49,11 @@ if __name__ == '__main__':
     station_port = os.getenv('GPS_STATION_PORT')
 
     if backend_url is None:
-        raise Exception('Backend address is not defined.'
+        raise Exception('Backend URL that saves location data is not defined. '
                         'Define "BACKEND_URL" variable in the environment that you are trying to run gps-station in.')
 
     if station_port is None:
-        raise Exception('gps-station\'s port is not defined.'
+        raise Exception('gps-station\'s port is not defined. '
                         'Define "GPS_STATION_PORT" variable in the environment that you are trying to run gps-station in.')
     else:
         try:
