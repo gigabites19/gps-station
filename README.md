@@ -18,7 +18,7 @@ To run **`gps-station`** you need:
 
 1. Build **`gps-station`** image: `docker build -t gps_station .`
 2. Run the built image: `docker run --name gps_station -p 8090:8090/tcp --mount type=bind,source=$(pwd)/logs/,destination=/gps-station/logs/ --env BACKEND_URL=http://localhost:8000/add-location/ --env GPS_STATION_PORT=8090 gps_station`
-3. Make sure port that you specified in `GPS_STATION_PORT` environment variable in previous step is open (I use [this tool](https://www.yougetsignal.com/tools/open-ports/))
+3. Make sure port that you specified in `GPS_STATION_PORT` environment variable in previous step is open (I use [this tool](https://www.yougetsignal.com/tools/open-ports/) while gps-station is running)
 
 > _**NOTE**_: don't forget to replace `BACKEND_URL` environment variable value in step 2 with your own
 
