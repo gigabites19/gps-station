@@ -50,8 +50,7 @@ class H02Protocol(BaseProtocol):
                 break
 
     async def send_uplink(self, location_payload: H02Location) -> None:
-        # TODO: replace `localhost:8000` with actual backend address defined in the environment
-        response = await self.client_session.post('http://localhost:8000/tracker/add-location/', data=location_payload.__dict__)
+        response = await self.client_session.post(self.backend_url, data=location_payload.__dict__)
 
         if response.status != 201:
             logger.critical(f'Backend returned unexpected status code. Could not save payload. Status code: {response.status}. Payload: {location_payload}')
