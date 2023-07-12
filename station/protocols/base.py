@@ -23,6 +23,8 @@ class BaseProtocol(ABC):
             `asyncio.StreamReader` instance used to await and read data sent by devices.
         session:
             Aiohttp session shared by all `BaseProtocol` instances, used to send data uplink.
+        backend_url:
+            URL of HTTP server that location payloads should be sent to.
         exception_counter:
             Number of exceptions caught during lifetime of the connection - each exception increments this attribute by 1.
         exception_threshold:
@@ -33,10 +35,17 @@ class BaseProtocol(ABC):
     exception_counter: int = 0
     exception_threshold: int = 10
 
-    def __init__(self, stream_reader: asyncio.StreamReader, stream_writer: asyncio.StreamWriter, session: aiohttp.ClientSession) -> None:
+    def __init__(
+        self,
+        stream_reader: asyncio.StreamReader,
+        stream_writer: asyncio.StreamWriter,
+        session: aiohttp.ClientSession,
+        backend_url: str
+    ) -> None:
         self.stream_reader = stream_reader
         self.stream_writer = stream_writer
         self.client_session = session
+        self.backend_url = backend_url
 
     @classmethod
     @abstractmethod
