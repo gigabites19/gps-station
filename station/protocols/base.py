@@ -26,7 +26,7 @@ class BaseProtocol(ABC):
         exception_counter:
             Number of exceptions caught during lifetime of the connection - each exception increments this attribute by 1.
         exception_threshold:
-            Maximum value `exception_counted` is allowed to reach, connection is closed threshold value is reached.
+            Maximum value `exception_counter` is allowed to reach, connection is closed when threshold value is reached.
     """
 
     packet_decoder: BasePacketDecoder
