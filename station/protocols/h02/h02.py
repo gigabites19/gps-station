@@ -37,9 +37,9 @@ class H02Protocol(BaseProtocol):
             except (RegExMatchError, BadProtocolError, UnicodeDecodeError) as e:
                 logger.warning(f'Could not decode bytes sent by a connected device(?). {e.__class__.__name__}: {e}')
                 self.exception_counter += 1
+            # Unexpected exceptions should also increment `exception_counter` but, unlike expected ones, they should also bubble up
             except Exception:
                 self.exception_counter += 1
-                # Unexpected exceptions should also increment `exception_counter` but, unlike expected ones, they should also bubble up
                 raise
             else:
                 await self.send_uplink(payload)
