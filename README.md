@@ -12,11 +12,11 @@ gps-station is a project that is essentially a TCP server, its purpose is to let
 
 
 ## How to run
-To run GPS station you need:
+To run **`gps-station`** you need:
 - Docker installed and running
 - To be in the directory of this package
 
 1. Build **`gps-station`** image: `docker build -t gps_station .`
-2. Runn the built image: `docker run --name gps_station -p 8090:8090/tcp --mount type=bind,source=$(pwd)/logs/,destination=/gps-station/logs/ gps_station`
+2. Run the built image: `docker run --name gps_station -p 8090:8090/tcp --mount type=bind,source=$(pwd)/logs/,destination=/gps-station/logs/ gps_station`
 3. Make sure port `8090` is open (I use [this tool](https://www.yougetsignal.com/tools/open-ports/))
 
