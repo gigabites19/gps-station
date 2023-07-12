@@ -3,13 +3,10 @@ import os
 from typing import Type
 
 import aiohttp
-from dotenv import load_dotenv
 
 from logger import logger
 from matcher import match_protocol
 from protocols import BaseProtocol
-
-load_dotenv()
 
 
 class Station:
