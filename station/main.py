@@ -32,11 +32,11 @@ class Station:
             writer.close()
             await writer.wait_closed()
 
-async def main(backend_url: str):
+async def main(backend_url: str, station_port: int):
     client_session = aiohttp.ClientSession()
     station = Station(backend_url, client_session)
 
-    server = await asyncio.start_server(station.handle_request, '', 8090)
+    server = await asyncio.start_server(station.handle_request, '', station_port)
 
     address = server.sockets[0].getsockname()
     logger.info(f'Serving on {address}')
@@ -46,10 +46,20 @@ async def main(backend_url: str):
 
 if __name__ == '__main__':
     backend_url = os.getenv('BACKEND_URL')
+    station_port = os.getenv('GPS_STATION_PORT')
 
     if backend_url is None:
         raise Exception('Backend address is not defined.'
                         'Define "BACKEND_URL" variable in the environment that you are trying to run gps-station in.')
 
-    asyncio.run(main(backend_url))
+    if station_port is None:
+        raise Exception('gps-station\'s port is not defined.'
+                        'Define "GPS_STATION_PORT" variable in the environment that you are trying to run gps-station in.')
+    else:
+        try:
+            station_port = int(station_port)
+        except ValueError:
+            raise ValueError(f'Invalid port number. string "{station_port}" could not be cast to int.')
+
+    asyncio.run(main(backend_url, station_port))
 
