@@ -36,7 +36,9 @@ config = {
     'handlers': {
         'info_handler': {
             'level': 'INFO',
-            'class': 'logging.FileHandler',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'maxBytes': 5_000_000,
+            'backupCount': 5,
             'filename': 'logs/info.log',
             'formatter': 'basic_formatter',
             'filters': [ get_filter_for_handler(20) ]
