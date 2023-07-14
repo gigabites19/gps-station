@@ -43,6 +43,9 @@ class H02Protocol(BaseProtocol):
                 raise
             else:
                 await self.send_uplink(payload)
+                self.total_sent += 1
+                self.device_imei = payload.device_serial_number
+                logger.info(f'Processed and sent data sent by IMEI:{payload.device_serial_number} to backend. Total sent: {self.total_sent}')
 
             if self.exception_counter >= self.exception_threshold:
                 logger.warning(f'Closing connection with client because exception threshold of {self.exception_threshold} was reached. ({client_address}:{client_port} - {self.__class__.__name__})')
