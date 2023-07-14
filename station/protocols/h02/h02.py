@@ -43,6 +43,12 @@ class H02Protocol(BaseProtocol):
                 raise
             else:
                 await self.send_uplink(payload)
+
+                # Purpose of this is not documented anywhere but sinotrackpro.com platform itself
+                # replies with such command if you connect to it ('45.112.204.245', 8090) with TCP socket.
+                self.stream_writer.write(f'*HQ,{self.device_imei},R12,{payload.time}#'.encode())
+                await self.stream_writer.drain()
+
                 self.total_sent += 1
                 self.device_imei = payload.device_serial_number
                 logger.info(f'Processed and sent data sent by IMEI:{payload.device_serial_number} to backend. Total sent: {self.total_sent}')
