@@ -19,6 +19,14 @@ class BaseProtocol(ABC):
     Attributes:
         packet_decoder:
             instance of `BasePacketDecoder`'s subclass used to decode data packets sent by device.
+        exception_counter:
+            Number of exceptions caught during lifetime of the connection - each exception increments this attribute by 1.
+        exception_threshold:
+            Maximum value `exception_counter` is allowed to reach, connection is closed when threshold value is reached.
+        device_imei:
+            IMEI of the connected device, not set initially but after protocol is identified and device is in a loop.
+        total_sent:
+            Total amount of packets sent to the backend in current session.
         stream_writer:
             `asyncio.StreamWriter` instance used to send data to device.
         stream_reader:
@@ -27,15 +35,13 @@ class BaseProtocol(ABC):
             Aiohttp session shared by all `BaseProtocol` instances, used to send data uplink.
         backend_url:
             URL of HTTP server that location payloads should be sent to.
-        exception_counter:
-            Number of exceptions caught during lifetime of the connection - each exception increments this attribute by 1.
-        exception_threshold:
-            Maximum value `exception_counter` is allowed to reach, connection is closed when threshold value is reached.
     """
 
     packet_decoder: BasePacketDecoder
     exception_counter: int = 0
     exception_threshold: int = 10
+    device_imei: str
+    total_sent: int = 0
 
     def __init__(
         self,
