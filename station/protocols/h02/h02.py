@@ -3,7 +3,6 @@ from protocols import BaseProtocol
 from protocols.exceptions import RegExMatchError, BadProtocolError
 
 from .packet_decoder import H02PacketDecoder
-from .payloads import H02Location
 
 class H02Protocol(BaseProtocol):
     """Implementation of H02 protocol, used by SinoTrack ST-901 trackers."""
