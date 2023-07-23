@@ -24,6 +24,14 @@ class H02Protocol(BaseProtocol):
         client_address, client_port = self.stream_writer.get_extra_info('peername')
 
         while True:
+            # FIXME: TCP is a stream-based protocol, instead of expecting "packets" we should
+            # read the first byte, identify which mode device is sending the record with:
+            # if first byte is '*' => ASCII mode, if first byte is '$' => binary mode - also called standard mode.
+            #
+            # After identifying record mode, we should read and add subsequent bytes to a buffer.
+            # We can know that record is complete in different ways for each mode.
+            # We can know that ASCII mode record is complete when '#' byte is sent. (All ASCII mode records end with #).
+            # Binary/standard mode records always have fixed length of 45 bytes including '$'.
             initial_data = await self.stream_reader.read(128)
 
             if initial_data == b'':
